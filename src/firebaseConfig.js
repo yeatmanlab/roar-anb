@@ -18,7 +18,7 @@ export const roarConfig = {
 };
 
 const logMessage = (
-  `This ROAR app will write data to the ${roarConfig.projectId} `
+  `This ROAR app will write data to the ${roarConfig.firebaseConfig.projectId} `
   + `Firestore database under the document ${rootDoc.join(" > ")}.`
 );
 log.info(logMessage);

@@ -1,6 +1,7 @@
 // jsPsych imports
 import jsPsychFullScreen from '@jspsych/plugin-fullscreen';
 import jsPsychHtmlKeyboardResponse from '@jspsych/plugin-html-keyboard-response';
+import jsPsychCallFunction from '@jspsych/plugin-call-function';
 
 // Import necessary for async in the top level of the experiment script
 import 'regenerator-runtime/runtime';
@@ -39,6 +40,7 @@ function evalAttentionChecks() {
 function assessPerformance() {
 	/* Function to calculate the "credit_var", which is a boolean used to
 	credit individual experiments in expfactory. */
+	// TODO: change the trial type and fix this function
 	var experiment_data = jsPsych.data.getTrialsOfType('poldrack-single-stim')
 	var missed_count = 0
 	var trial_count = 0
@@ -93,19 +95,18 @@ var randomDraw = function(lst) {
 var record_acc = function(data) {
 	var target_lower = data.target.toLowerCase()
 	var stim_lower = curr_stim.toLowerCase(0)
-	var key = data.key_press
-	if (stim_lower == target_lower && key == 37) {
+	var key = data.response
+	let correct = false;
+	if (stim_lower == target_lower && jsPsych.pluginAPI.compareKeys(key, "ArrowLeft")) {
 		correct = true
 		if (block_trial >= delay) {
 			block_acc += 1
 		}
-	} else if (stim_lower != target_lower && key == 40) {
+	} else if (stim_lower != target_lower && jsPsych.pluginAPI.compareKeys(key, "ArrowRight")) {
 		correct = true
 		if (block_trial >= delay) {
 			block_acc += 1
 		}
-	} else {
-		correct = false
 	}
 	jsPsych.data.addDataToLastTrial({
 		correct: correct,
@@ -151,7 +152,9 @@ var getStim = function() {
 		curr_stim = randomDraw(non_targets)
 	}
 	stims.push(curr_stim)
-	return '<div class = "centerbox"><div class = "center-text">' + curr_stim + '</div></div>'
+	// return '<div class = "centerbox"><div class = "center-text"><p>' + stim + '</p></div></div>',
+	
+	return '<div class = "centerbox"><div class = "center-text"><p>' + curr_stim + '</p></div></div>'
 }
 
 var getData = function() {
@@ -182,9 +185,13 @@ var credit_var = true //default to true
 
 // task specific variables
 var letters = 'bBdDgGtTvV'.split("")
-var num_blocks = 20 // number of adaptive blocks
-var base_num_trials = 20 // total num_trials = base + load 
-var control_num_trials = 42
+// var num_blocks = 20 // number of adaptive blocks
+// var base_num_trials = 20 // total num_trials = base + load 
+// var control_num_trials = 42
+// TODO: uncomment the above 3 lines and delete the 3 below
+var num_blocks = 2 // number of adaptive blocks
+var base_num_trials = 2 // total num_trials = base + load 
+var control_num_trials = 3
 var control_before = Math.round(Math.random()) //0 control comes before test, 1, after
 var block_acc = 0 // record block accuracy to determine next blocks delay
 var delay = 2 // starting delay
@@ -285,35 +292,29 @@ var instruction_node = {
 }
 
 var end_block = {
-	// TODO: Press enter to END?
-	// TODO: You can refer to the begin_block
-	type: 'poldrack-text',
-	text: '<div class = "centerbox"><p class = "center-block-text">Thanks for completing this task!</p><p class = center-block-text>Press <strong>enter</strong> to begin.</p></div>',
-	cont_key: [13],
+	type: jsPsychHtmlKeyboardResponse,
+	stimulus: '<div class = "centerbox"><p class = "center-block-text">Thanks for completing this task!</p><p class = center-block-text>Press <strong>enter</strong> to begin.</p></div>',
+	choices: ['Enter'],
 	data: {
 		trial_id: "end",
     	exp_id: 'adaptive_n_back'
 	},
-	timing_response: 180000,
-	timing_post_trial: 0,
-	on_finish: assessPerformance
+	// TODO: uncomment the below line when assessPerformance is completed
+	// on_finish: assessPerformance
 };
 
 var start_practice_block = {
 	type: jsPsychHtmlKeyboardResponse,
 	stimulus: '<div class = "centerbox"><p class = "block-text">Starting practice. During practice, you should press the left arrow key when the current letter matches the letter that appeared 1 trial before. Otherwise press the down arrow key</p><p class = center-block-text>You will receive feedback about whether you were correct or not during practice. There will be no feedback during the main experiment. Press <strong>enter</strong> to begin.</p></div>',
   choices: ['Enter'],
-	// cont_key: [13],
 	data: {
 		trial_id: "instruction",
 	},
-	// timing_response: 180000,
-	// timing_post_trial: 1000
 };
 
 // TODO: Reference: https://www.jspsych.org/7.0/plugins/call-function/
 var update_delay_block = {
-	type: 'call-function',
+	type: jsPsychCallFunction,
 	func: update_delay,
 	data: {
 		trial_id: "update_delay"
@@ -322,7 +323,7 @@ var update_delay_block = {
 }
 
 var update_target_block = {
-	type: 'call-function',
+	type: jsPsychCallFunction,
 	func: update_target,
 	data: {
 		trial_id: "update_target"
@@ -331,14 +332,12 @@ var update_target_block = {
 }
 
 var start_control_block = {
-	type: 'poldrack-text',
-	text: '<div class = "centerbox"><p class = "block-text">In this block you do not have to match letters to previous letters. Instead, press the left arrow key everytime you see a "t" or "T" and the down arrow key for all other letters.</p><p class = center-block-text>Press <strong>enter</strong> to begin.</p></div>',
-	cont_key: [13],
+	type: jsPsychHtmlKeyboardResponse,
+	stimulus: '<div class = "centerbox"><p class = "block-text">In this block you do not have to match letters to previous letters. Instead, press the left arrow key everytime you see a "t" or "T" and the down arrow key for all other letters.</p><p class = center-block-text>Press <strong>enter</strong> to begin.</p></div>',
+	choices: ['Enter'],
 	data: {
 		trial_id: "instruction"
 	},
-	timing_response: 180000,
-	timing_post_trial: 2000,
 	on_finish: function() {
 		target_trials = jsPsych.randomization.repeat(['target','0', '0'], Math.round(control_num_trials/3)).slice(0,control_num_trials)
 		target = 't'
@@ -346,13 +345,13 @@ var start_control_block = {
 };
 
 var start_adaptive_block = {
-	type: 'poldrack-text',
+	type: jsPsychHtmlKeyboardResponse,
 	data: {
 		exp_stage: "adaptive",
 		trial_id: "delay_text"
 	},
-	text: getText,
-	cont_key: [13],
+	stimulus: getText,
+	choices: ['Enter'],
 	on_finish: function() {
 		block_trial = 0
 		stims = []
@@ -377,14 +376,11 @@ var start_adaptive_block = {
 
 // TODO: Could be converted to html keyboard response
 var adaptive_block = {
-	type: 'poldrack-single-stim',
+	type: jsPsychHtmlKeyboardResponse,
 	is_html: true,
 	stimulus: getStim,
 	data: getData,
-	choices: [37,40],
-	timing_stim: 500,
-	timing_response: 2000,
-	timing_post_trial: 0,
+	choices: ['ArrowLeft', 'ArrowRight'],
 	on_finish: function(data) {
 		record_acc(data)
 	}
@@ -465,7 +461,7 @@ for (var i = 0; i < (base_num_trials + 1); i++) {
 var control_trials = []
 for (var i = 0; i < control_num_trials; i++) {
 	var control_block = {
-		type: 'poldrack-single-stim',
+		type: jsPsychHtmlKeyboardResponse,
 		is_html: true,
 		stimulus: getStim,
 		data: {
@@ -474,10 +470,7 @@ for (var i = 0; i < control_num_trials; i++) {
 			load: 0,
 			target: 't',
 		},
-		choices: [37,40],
-		timing_stim: 500,
-		timing_response: 2000,
-		timing_post_trial: 0,
+		choices: ['ArrowLeft', 'ArrowRight'],
 		on_finish: function(data) {
 			record_acc(data)
 		}
@@ -499,30 +492,30 @@ var adaptive_test_node = {
 
 //Set up experiment
 var adaptive_n_back_experiment = []
-adaptive_n_back_experiment.push(instruction_node);
-adaptive_n_back_experiment.push(start_practice_block)
-adaptive_n_back_experiment = adaptive_n_back_experiment.concat(practice_trials)
+// adaptive_n_back_experiment.push(instruction_node);
+// adaptive_n_back_experiment.push(start_practice_block);
+adaptive_n_back_experiment = adaptive_n_back_experiment.concat(practice_trials);
 
-// if (control_before === 0) {
-// 	adaptive_n_back_experiment.push(start_control_block)
-// 	adaptive_n_back_experiment = adaptive_n_back_experiment.concat(control_trials)
-// }
-// for (var b = 0; b < num_blocks; b++) { 
-// 	adaptive_n_back_experiment.push(start_adaptive_block)
-// 	adaptive_n_back_experiment.push(adaptive_test_node)
-// 	if ([4, 7, 15].includes(b)) {
-// 		adaptive_n_back_experiment.push(attention_node)
-// 	}
-// 	adaptive_n_back_experiment.push(update_delay_block)
-// }
+if (control_before === 0) {
+	adaptive_n_back_experiment.push(start_control_block)
+	adaptive_n_back_experiment = adaptive_n_back_experiment.concat(control_trials)
+}
+for (var b = 0; b < num_blocks; b++) { 
+	adaptive_n_back_experiment.push(start_adaptive_block)
+	adaptive_n_back_experiment.push(adaptive_test_node)
+	// if ([4, 7, 15].includes(b)) {
+	// 	adaptive_n_back_experiment.push(attention_node)
+	// }
+	adaptive_n_back_experiment.push(update_delay_block)
+}
 
-// if (control_before == 1) {
-// 	adaptive_n_back_experiment.push(start_control_block)
-// 	adaptive_n_back_experiment = adaptive_n_back_experiment.concat(control_trials)
-// }
-// //Set up control
+if (control_before == 1) {
+	adaptive_n_back_experiment.push(start_control_block)
+	adaptive_n_back_experiment = adaptive_n_back_experiment.concat(control_trials)
+}
+//Set up control
 // adaptive_n_back_experiment.push(post_task_block)
-// adaptive_n_back_experiment.push(end_block)
+adaptive_n_back_experiment.push(end_block)
 
 const exit_fullscreen = {
   type: jsPsychFullScreen,
