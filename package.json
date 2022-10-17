@@ -1,0 +1,59 @@
+{
+  "name": "roar-anb",
+  "description": "Development for jsPsych version of ROAR adaptive n back. Versions and their dependencies are packaged within folders to ensure continued functionality as new test versions are deployed.",
+  "version": "1.0.0",
+  "author": "Shoaib Mohammed <shoaib98libra@gmail.com>",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npx webpack --mode production",
+    "build:dev": "npm run build -- --env dbmode=development",
+    "build:prod": "npm run build -- --env dbmode=production",
+    "start": "npx webpack serve --open --mode development",
+    "start:dev": "npm run start -- --env dbmode=development",
+    "start:prod": "npm run start -- --env dbmode=production"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yeatmanlab/roar-anb.git"
+  },
+  "license": "STANFORD ACADEMIC SOFTWARE LICENSE FOR ROAR™",
+  "keywords": [
+    "roar",
+    "literacy",
+    "dyslexia",
+    "reading",
+    "web-assessment"
+  ],
+  "bugs": {
+    "url": "https://github.com/yeatmanlab/roar-anb/issues"
+  },
+  "homepage": "https://github.com/yeatmanlab/roar-anb",
+  "dependencies": {
+    "@babel/core": "^7.19.3",
+    "@babel/preset-env": "^7.19.3",
+    "@bdelab/roar-firekit": "^1.1.2",
+    "@jspsych/plugin-fullscreen": "^1.1.2",
+    "@jspsych/plugin-html-keyboard-response": "^1.1.2",
+    "@jspsych/plugin-preload": "^1.1.2",
+    "@jspsych/plugin-survey-text": "^1.1.2",
+    "babel-loader": "^8.2.5",
+    "file-loader": "^6.2.0",
+    "jspsych": "^7.3.0",
+    "papaparse": "^5.3.2",
+    "regenerator-runtime": "^0.13.9",
+    "roarr": "^7.13.0",
+    "webpack": "^5.74.0",
+    "webpack-cli": "^4.10.0",
+    "webpack-dev-server": "^4.11.1"
+  },
+  "devDependencies": {
+    "css-loader": "^6.7.1",
+    "eslint": "^8.24.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "html-webpack-plugin": "^5.5.0",
+    "style-loader": "^3.3.1",
+    "webpack-merge": "^5.8.0"
+  }
+}
