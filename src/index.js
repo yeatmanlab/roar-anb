@@ -152,8 +152,6 @@ var getStim = function() {
 		curr_stim = randomDraw(non_targets)
 	}
 	stims.push(curr_stim)
-	// return '<div class = "centerbox"><div class = "center-text"><p>' + stim + '</p></div></div>',
-	
 	return '<div class = "centerbox"><div class = "center-text"><p>' + curr_stim + '</p></div></div>'
 }
 
@@ -210,37 +208,37 @@ var stims = [] //hold stims per block
 // Set up attention check node
 // TODO: HtmlKeyboardResponse
 // TODO: Discuss about this, it's only checking for attention through some questions.
-var attention_check_block = {
-	type: 'attention-check',
-	data: {
-		trial_id: "attention",
-	},
-	timing_response: 180000,
-	response_ends_trial: true,
-	timing_post_trial: 200
-}
+// var attention_check_block = {
+// 	type: 'attention-check',
+// 	data: {
+// 		trial_id: "attention",
+// 	},
+// 	timing_response: 180000,
+// 	response_ends_trial: true,
+// 	timing_post_trial: 200
+// }
 
-var attention_node = {
-	timeline: [attention_check_block],
-	conditional_function: function() {
-		return run_attention_checks
-	}
-}
+// var attention_node = {
+// 	timeline: [attention_check_block],
+// 	conditional_function: function() {
+// 		return run_attention_checks
+// 	}
+// }
 
 //Set up post task questionnaire
 // TODO: jspsych default, update the type
 // TODO: Reference, https://www.jspsych.org/7.0/plugins/survey-text/
-var post_task_block = {
-   type: 'survey-text',
-   data: {
-   	   exp_id: "adaptive_n_back",
-       trial_id: "post task questions"
-   },
-   questions: ['<p class = center-block-text style = "font-size: 20px">Please summarize what you were asked to do in this task.</p>',
-              '<p class = center-block-text style = "font-size: 20px">Do you have any comments about this task?</p>'],
-   rows: [15, 15],
-   columns: [60,60]
-};
+// var post_task_block = {
+//    type: 'survey-text',
+//    data: {
+//    	   exp_id: "adaptive_n_back",
+//        trial_id: "post task questions"
+//    },
+//    questions: ['<p class = center-block-text style = "font-size: 20px">Please summarize what you were asked to do in this task.</p>',
+//               '<p class = center-block-text style = "font-size: 20px">Do you have any comments about this task?</p>'],
+//    rows: [15, 15],
+//    columns: [60,60]
+// };
 
 /* define static blocks */
 var feedback_instruct_text =
@@ -268,28 +266,28 @@ var instructions_block = {
 	// timing_post_trial: 1000
 };
 
-var instruction_node = {
-	timeline: [feedback_instruct_block, instructions_block],
-	// TODO: Remove this block, unnecessary
-	// TODO: Maybe check with the team first
-	/* This function defines stopping criteria */
-	// loop_function: function(data) {
-	// 	for (i = 0; i < data.length; i++) {
-	// 		if ((data[i].trial_type == 'poldrack-instructions') && (data[i].rt != -1)) {
-	// 			rt = data[i].rt
-	// 			sumInstructTime = sumInstructTime + rt
-	// 		}
-	// 	}
-	// 	if (sumInstructTime <= instructTimeThresh * 1000) {
-	// 		feedback_instruct_text =
-	// 			'Read through instructions too quickly.  Please take your time and make sure you understand the instructions.  Press <strong>enter</strong> to continue.'
-	// 		return true
-	// 	} else if (sumInstructTime > instructTimeThresh * 1000) {
-	// 		feedback_instruct_text = 'Done with instructions. Press <strong>enter</strong> to continue.'
-	// 		return false
-	// 	}
-	// }
-}
+// var instruction_node = {
+// 	timeline: [feedback_instruct_block, instructions_block],
+// 	// TODO: Remove this block, unnecessary
+// 	// TODO: Maybe check with the team first
+// 	/* This function defines stopping criteria */
+// 	loop_function: function(data) {
+// 		for (i = 0; i < data.length; i++) {
+// 			if ((data[i].trial_type == 'poldrack-instructions') && (data[i].rt != -1)) {
+// 				rt = data[i].rt
+// 				sumInstructTime = sumInstructTime + rt
+// 			}
+// 		}
+// 		if (sumInstructTime <= instructTimeThresh * 1000) {
+// 			feedback_instruct_text =
+// 				'Read through instructions too quickly.  Please take your time and make sure you understand the instructions.  Press <strong>enter</strong> to continue.'
+// 			return true
+// 		} else if (sumInstructTime > instructTimeThresh * 1000) {
+// 			feedback_instruct_text = 'Done with instructions. Press <strong>enter</strong> to continue.'
+// 			return false
+// 		}
+// 	}
+// }
 
 var end_block = {
 	type: jsPsychHtmlKeyboardResponse,
