@@ -1,3 +1,23 @@
+// jsPsych imports
+import jsPsychFullScreen from '@jspsych/plugin-fullscreen';
+import jsPsychHtmlKeyboardResponse from '@jspsych/plugin-html-keyboard-response';
+
+// Import necessary for async in the top level of the experiment script
+import 'regenerator-runtime/runtime';
+
+// CSS imports
+import './css/roar.css';
+
+// Local modules
+import { initConfig, initRoarJsPsych, initRoarTimeline } from './config';
+
+import { allTargets, preloadImages } from './loadAssets';
+
+// ---------Initialize the jsPsych object and the timeline---------
+const config = await initConfig();
+const jsPsych = initRoarJsPsych(config);
+const timeline = initRoarTimeline(config);
+
 /* ************************************ */
 /* Define helper functions */
 /* ************************************ */
@@ -59,7 +79,7 @@ function assessPerformance() {
 }
 
 var getInstructFeedback = function() {
-	return '<div class = centerbox><p class = center-block-text>' + feedback_instruct_text +
+	return '<div class = "centerbox"><p class = center-block-text>' + feedback_instruct_text +
 		'</p></div>'
 }
 
@@ -181,10 +201,12 @@ var stims = [] //hold stims per block
 /* Set up jsPsych blocks */
 /* ************************************ */
 // Set up attention check node
+// TODO: HtmlKeyboardResponse
+// TODO: Discuss about this, it's only checking for attention through some questions.
 var attention_check_block = {
 	type: 'attention-check',
 	data: {
-		trial_id: "attention"
+		trial_id: "attention",
 	},
 	timing_response: 180000,
 	response_ends_trial: true,
@@ -199,6 +221,8 @@ var attention_node = {
 }
 
 //Set up post task questionnaire
+// TODO: jspsych default, update the type
+// TODO: Reference, https://www.jspsych.org/7.0/plugins/survey-text/
 var post_task_block = {
    type: 'survey-text',
    data: {
@@ -215,51 +239,54 @@ var post_task_block = {
 var feedback_instruct_text =
 	'Welcome to the experiment. This task will take around 20 minutes. Press <strong>enter</strong> to begin.'
 var feedback_instruct_block = {
-	type: 'poldrack-text',
-	cont_key: [13],
+	type: jsPsychHtmlKeyboardResponse,
+	// cont_key: [13],
 	data: {
 		trial_id: 'instruction'
 	},
-	text: getInstructFeedback,
-	timing_post_trial: 0,
-	timing_response: 180000
+	stimulus: getInstructFeedback,
+  choices: ['Enter']
+	// timing_post_trial: 0,
+	// timing_response: 180000
 };
 /// This ensures that the subject does not read through the instructions too quickly.  If they do it too quickly, then we will go over the loop again.
 var instructions_block = {
-	type: 'poldrack-instructions',
-	pages: [
-		'<div class = "centerbox"><p class = "block-text">In this experiment you will see a sequence of letters presented one at a time. Your job is to respond by pressing the <strong>left arrow key</strong> when the letter matches the same letter that occured some number of trials before (the number of trials is called the "delay"), otherwise you should press the <strong>down arrow key</strong>. The letters will be both lower and upper case. You should ignore the case (so "t" matches "T").</p><p class = block-text>The specific delay you should pay attention to will differ between blocks of trials, and you will be told the delay before starting a block.</p><p class = block-text>For instance, if the delay is 2, you are supposed to press the left arrow key when the current letter matches the letter that occurred 2 trials ago. If you saw the sequence: g...G...v...T...b...t...b, you would press the left arrow key on the last "t" and the last "b" and the down arrow key for every other letter.</p><p class = block-text>On one block of trials there will be no delay. On this block you will be instructed to press the left arrow key to the presentation of a specific letter on that trial. For instance, the specific letter may be "t", in which case you would press the left arrow key to "t" or "T".</p></div>'
-	],
+	type: jsPsychHtmlKeyboardResponse,
+	stimulus: '<div class = "centerbox"><p class = "block-text">In this experiment you will see a sequence of letters presented one at a time. Your job is to respond by pressing the <strong>left arrow key</strong> when the letter matches the same letter that occured some number of trials before (the number of trials is called the "delay"), otherwise you should press the <strong>down arrow key</strong>. The letters will be both lower and upper case. You should ignore the case (so "t" matches "T").</p><p class = "block-text">The specific delay you should pay attention to will differ between blocks of trials, and you will be told the delay before starting a block.</p><p class = "block-text">For instance, if the delay is 2, you are supposed to press the left arrow key when the current letter matches the letter that occurred 2 trials ago. If you saw the sequence: g...G...v...T...b...t...b, you would press the left arrow key on the last "t" and the last "b" and the down arrow key for every other letter.</p><p class = "block-text">On one block of trials there will be no delay. On this block you will be instructed to press the left arrow key to the presentation of a specific letter on that trial. For instance, the specific letter may be "t", in which case you would press the left arrow key to "t" or "T".</p><p class = "block-text">Press <strong>enter</strong> to continue.</p></div>',
 	data: {
 		trial_id: 'instruction'
 	},
-	allow_keys: false,
-	show_clickable_nav: true,
-	timing_post_trial: 1000
+	choices: ['Enter'],
+	// show_clickable_nav: true,
+	// timing_post_trial: 1000
 };
 
 var instruction_node = {
 	timeline: [feedback_instruct_block, instructions_block],
+	// TODO: Remove this block, unnecessary
+	// TODO: Maybe check with the team first
 	/* This function defines stopping criteria */
-	loop_function: function(data) {
-		for (i = 0; i < data.length; i++) {
-			if ((data[i].trial_type == 'poldrack-instructions') && (data[i].rt != -1)) {
-				rt = data[i].rt
-				sumInstructTime = sumInstructTime + rt
-			}
-		}
-		if (sumInstructTime <= instructTimeThresh * 1000) {
-			feedback_instruct_text =
-				'Read through instructions too quickly.  Please take your time and make sure you understand the instructions.  Press <strong>enter</strong> to continue.'
-			return true
-		} else if (sumInstructTime > instructTimeThresh * 1000) {
-			feedback_instruct_text = 'Done with instructions. Press <strong>enter</strong> to continue.'
-			return false
-		}
-	}
+	// loop_function: function(data) {
+	// 	for (i = 0; i < data.length; i++) {
+	// 		if ((data[i].trial_type == 'poldrack-instructions') && (data[i].rt != -1)) {
+	// 			rt = data[i].rt
+	// 			sumInstructTime = sumInstructTime + rt
+	// 		}
+	// 	}
+	// 	if (sumInstructTime <= instructTimeThresh * 1000) {
+	// 		feedback_instruct_text =
+	// 			'Read through instructions too quickly.  Please take your time and make sure you understand the instructions.  Press <strong>enter</strong> to continue.'
+	// 		return true
+	// 	} else if (sumInstructTime > instructTimeThresh * 1000) {
+	// 		feedback_instruct_text = 'Done with instructions. Press <strong>enter</strong> to continue.'
+	// 		return false
+	// 	}
+	// }
 }
 
 var end_block = {
+	// TODO: Press enter to END?
+	// TODO: You can refer to the begin_block
 	type: 'poldrack-text',
 	text: '<div class = "centerbox"><p class = "center-block-text">Thanks for completing this task!</p><p class = center-block-text>Press <strong>enter</strong> to begin.</p></div>',
 	cont_key: [13],
@@ -273,16 +300,18 @@ var end_block = {
 };
 
 var start_practice_block = {
-	type: 'poldrack-text',
-	text: '<div class = centerbox><p class = block-text>Starting practice. During practice, you should press the left arrow key when the current letter matches the letter that appeared 1 trial before. Otherwise press the down arrow key</p><p class = center-block-text>You will receive feedback about whether you were correct or not during practice. There will be no feedback during the main experiment. Press <strong>enter</strong> to begin.</p></div>',
-	cont_key: [13],
+	type: jsPsychHtmlKeyboardResponse,
+	stimulus: '<div class = "centerbox"><p class = "block-text">Starting practice. During practice, you should press the left arrow key when the current letter matches the letter that appeared 1 trial before. Otherwise press the down arrow key</p><p class = center-block-text>You will receive feedback about whether you were correct or not during practice. There will be no feedback during the main experiment. Press <strong>enter</strong> to begin.</p></div>',
+  choices: ['Enter'],
+	// cont_key: [13],
 	data: {
-		trial_id: "instruction"
+		trial_id: "instruction",
 	},
-	timing_response: 180000,
-	timing_post_trial: 1000
+	// timing_response: 180000,
+	// timing_post_trial: 1000
 };
 
+// TODO: Reference: https://www.jspsych.org/7.0/plugins/call-function/
 var update_delay_block = {
 	type: 'call-function',
 	func: update_delay,
@@ -303,7 +332,7 @@ var update_target_block = {
 
 var start_control_block = {
 	type: 'poldrack-text',
-	text: '<div class = centerbox><p class = block-text>In this block you do not have to match letters to previous letters. Instead, press the left arrow key everytime you see a "t" or "T" and the down arrow key for all other letters.</p><p class = center-block-text>Press <strong>enter</strong> to begin.</p></div>',
+	text: '<div class = "centerbox"><p class = "block-text">In this block you do not have to match letters to previous letters. Instead, press the left arrow key everytime you see a "t" or "T" and the down arrow key for all other letters.</p><p class = center-block-text>Press <strong>enter</strong> to begin.</p></div>',
 	cont_key: [13],
 	data: {
 		trial_id: "instruction"
@@ -346,6 +375,7 @@ var start_adaptive_block = {
 	}
 };
 
+// TODO: Could be converted to html keyboard response
 var adaptive_block = {
 	type: 'poldrack-single-stim',
 	is_html: true,
@@ -361,40 +391,74 @@ var adaptive_block = {
 };
 
 //Setup 1-back practice
-practice_trials = []
+const practice_trials = []
 for (var i = 0; i < (base_num_trials + 1); i++) {
 	var stim = randomDraw(letters)
 	stims.push(stim)
 	if (i >= 1) {
 		target = stims[i - 1]
 	}
-	if (stim.toLowerCase() == target.toLowerCase()) { 
-		correct_response = 37
-	} else {
-		correct_response = 40
-	}
-	var practice_block = {
-		type: 'poldrack-categorize',
+	const matching_response = stim.toLowerCase() == target.toLowerCase();
+	// const correct_response = (stim.toLowerCase() == target.toLowerCase()) ? 37 : 40;
+	let practice_block = {
+		type: jsPsychHtmlKeyboardResponse,
 		is_html: true,
-		stimulus: '<div class = centerbox><div class = center-text>' + stim + '</div></div>',
-		key_answer: correct_response,
+		stimulus: '<div class = "centerbox"><div class = center-text><p>' + stim + '</p></div></div>',
+		// key_answer: correct_response,
 		data: {
 			trial_id: "stim",
 			exp_stage: "practice",
 			stim: stim,
 			target: target
 		},
-		correct_text: '<div class = centerbox><div style="color:green;font-size:60px"; class = center-text>Correct!</div></div>',
-		incorrect_text: '<div class = centerbox><div style="color:red;font-size:60px"; class = center-text>Incorrect</div></div>',
-		timeout_message: '<div class = centerbox><div style="font-size:60px" class = center-text>Respond Faster!</div></div>',
-		timing_feedback_duration: 500,
-		show_stim_with_feedback: false,
-		choices: [37,40],
-		timing_stim: 500,
-		timing_response: 2000,
-		timing_post_trial: 500
+		choices: ['ArrowLeft', 'ArrowRight'],
+		on_finish: function(data){
+			// Score the response as correct or incorrect.
+			if (matching_response)
+				data.correct = jsPsych.pluginAPI.compareKeys(data.response, "ArrowLeft");
+			else
+				data.correct = jsPsych.pluginAPI.compareKeys(data.response, "ArrowRight");
+		  }
+		// correct_text: '<div class = "centerbox"><div style="color:green;font-size:60px"; class = center-text>Correct!</div></div>',
+		// incorrect_text: '<div class = "centerbox"><div style="color:red;font-size:60px"; class = center-text>Incorrect</div></div>',
+		// timeout_message: '<div class = "centerbox"><div style="font-size:60px" class = center-text>Respond Faster!</div></div>',
+		// timing_feedback_duration: 500,
+		// show_stim_with_feedback: false,
+		// choices: [37,40],
+		// timing_stim: 500,
+		// timing_response: 2000,
+		// timing_post_trial: 500
 	};
-	practice_trials.push(practice_block)
+	// var trial = {
+	// 	type: jsPsychHtmlKeyboardResponse,
+	// 	stimulus: '<<<<<',
+	// 	choices: ['f','j'],
+	// 	data: {
+	// 	  stimulus_type: 'congruent',
+	// 	  target_direction: 'left'
+	// 	},
+		
+	//   }
+	  
+	  var feedback = {
+		type: jsPsychHtmlKeyboardResponse,
+		choices: 'NO_KEYS',
+		trial_duration: 1000,
+		stimulus: function(){
+		  // The feedback stimulus is a dynamic parameter because we can't know in advance whether
+		  // the stimulus should be 'correct' or 'incorrect'.
+		  // Instead, this function will check the accuracy of the last response and use that information to set
+		  // the stimulus value on each trial.
+		  var last_trial_correct = jsPsych.data.get().last(1).values()[0].correct;
+		  if(last_trial_correct){
+			return '<div class = "centerbox"><div style="color:green;font-size:60px"; class = center-text>Correct!</div></div>'; // the parameter value has to be returned from the function
+		  } else {
+			return '<div class = "centerbox"><div style="color:red;font-size:60px"; class = center-text>Wrong!</div></div>'; // the parameter value has to be returned from the function
+		  }
+		}
+	  }
+	  
+	  practice_trials.push(practice_block, feedback);
 }
 
 //Define control (0-back) block
@@ -432,32 +496,42 @@ var adaptive_test_node = {
 		}
 	}
 }
-	
+
 //Set up experiment
 var adaptive_n_back_experiment = []
 adaptive_n_back_experiment.push(instruction_node);
 adaptive_n_back_experiment.push(start_practice_block)
 adaptive_n_back_experiment = adaptive_n_back_experiment.concat(practice_trials)
 
-if (control_before === 0) {
-	adaptive_n_back_experiment.push(start_control_block)
-	adaptive_n_back_experiment = adaptive_n_back_experiment.concat(control_trials)
-}
-for (var b = 0; b < num_blocks; b++) { 
-	adaptive_n_back_experiment.push(start_adaptive_block)
-	adaptive_n_back_experiment.push(adaptive_test_node)
-	if ($.inArray(b, [4, 7, 15]) != -1) {
-		adaptive_n_back_experiment.push(attention_node)
-	}
-	adaptive_n_back_experiment.push(update_delay_block)
-}
+// if (control_before === 0) {
+// 	adaptive_n_back_experiment.push(start_control_block)
+// 	adaptive_n_back_experiment = adaptive_n_back_experiment.concat(control_trials)
+// }
+// for (var b = 0; b < num_blocks; b++) { 
+// 	adaptive_n_back_experiment.push(start_adaptive_block)
+// 	adaptive_n_back_experiment.push(adaptive_test_node)
+// 	if ([4, 7, 15].includes(b)) {
+// 		adaptive_n_back_experiment.push(attention_node)
+// 	}
+// 	adaptive_n_back_experiment.push(update_delay_block)
+// }
 
+// if (control_before == 1) {
+// 	adaptive_n_back_experiment.push(start_control_block)
+// 	adaptive_n_back_experiment = adaptive_n_back_experiment.concat(control_trials)
+// }
+// //Set up control
+// adaptive_n_back_experiment.push(post_task_block)
+// adaptive_n_back_experiment.push(end_block)
 
+const exit_fullscreen = {
+  type: jsPsychFullScreen,
+  fullscreen_mode: false,
+  delay_after: 0,
+};
 
-if (control_before == 1) {
-	adaptive_n_back_experiment.push(start_control_block)
-	adaptive_n_back_experiment = adaptive_n_back_experiment.concat(control_trials)
-}
-//Set up control
-adaptive_n_back_experiment.push(post_task_block)
-adaptive_n_back_experiment.push(end_block)
+timeline.push(...adaptive_n_back_experiment);
+
+timeline.push(exit_fullscreen);
+
+jsPsych.run(timeline);
