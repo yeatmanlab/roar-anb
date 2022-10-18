@@ -24,18 +24,20 @@ const timeline = initRoarTimeline(config);
 /* Define helper functions */
 /* ************************************ */
 function assessPerformance() {
-  /* Function to calculate the "credit_var", which is a boolean used to
-  credit individual experiments in expfactory. */
-  var experiment_data = [];    // TODO: change the trial type and fix this function jsPsych.data.getTrialsOfType('poldrack-single-stim')
-  var missed_count = 0
-  var trial_count = 0
-  var rt_array = []
-  var rt = 0
-    //record choices participants made
-  var choice_counts = {}
+  /* Function to calculate the "credit_let", which is a boolean
+   * used to credit individual experiments in expfactory.
+   */
+  let experiment_data = [];    // TODO: change the trial type and fix this function jsPsych.data.getTrialsOfType('poldrack-single-stim')
+  let missed_count = 0
+  let trial_count = 0
+  let rt_array = []
+  let rt = 0
+  
+  // record choices participants made
+  let choice_counts = {}
   choice_counts[-1] = 0
   choice_counts[32] = 0
-  for (var i = 0; i < experiment_data.length; i++) {
+  for (let i = 0; i < experiment_data.length; i++) {
     if (experiment_data[i].possible_responses != 'none') {
       trial_count += 1
       rt = experiment_data[i].rt
@@ -48,39 +50,41 @@ function assessPerformance() {
       }
     }
   }
-  //calculate average rt
-  var avg_rt = -1
+  
+  // calculate average rt
+  let avg_rt = -1
   if (rt_array.length !== 0) {
     avg_rt = math.median(rt_array)
   } 
-  var missed_percent = missed_count/experiment_data.length
+  let missed_percent = missed_count/experiment_data.length
+  
   //calculate whether response distribution is okay
-  var responses_ok = true
-  Object.keys(choice_counts).forEach(function(key, index) {
+  let responses_ok = true
+  Object.keys(choice_counts).forEach((key, index) => {
     if (choice_counts[key] > trial_count * 0.85) {
       responses_ok = false
     }
   })
-  credit_var = (missed_percent < 0.4 && (avg_rt > 200) && responses_ok)
-  jsPsych.data.addDataToLastTrial({"credit_var": credit_var})
+  credit_let = (missed_percent < 0.4 && (avg_rt > 200) && responses_ok)
+  jsPsych.data.addDataToLastTrial({"credit_let": credit_let})
 }
 
-var getInstructFeedback = function() {
+let getInstructFeedback = () => {
   return '<div class = "centerbox"><p class = center-block-text>' + feedback_instruct_text +
     '</p></div>'
 }
 
-var randomDraw = function(lst) {
-  var index = Math.floor(Math.random() * (lst.length))
+let randomDraw = (lst) => {
+  let index = Math.floor(Math.random() * (lst.length))
   return lst[index]
 };
 
 
-//Calculates whether the last trial was correct and records the accuracy in data object
-var record_acc = function(data) {
-  var target_lower = data.target.toLowerCase()
-  var stim_lower = curr_stim.toLowerCase(0)
-  var key = data.response
+// calculates whether the last trial was correct and records the accuracy in data object
+let record_acc = (data) => {
+  let target_lower = data.target.toLowerCase()
+  let stim_lower = curr_stim.toLowerCase(0)
+  let key = data.response
   let correct = false;
   if (stim_lower == target_lower && jsPsych.pluginAPI.compareKeys(key, "ArrowLeft")) {
     correct = true
@@ -102,8 +106,8 @@ var record_acc = function(data) {
   block_trial = block_trial + 1
 };
 
-var update_delay = function() {
-  var mistakes = base_num_trials - block_acc
+let update_delay = () => {
+  let mistakes = base_num_trials - block_acc
   if (delay >= 2) {
     if (mistakes < 3) {
       delay += 1
@@ -119,7 +123,7 @@ var update_delay = function() {
   current_block += 1
 };
 
-var update_target = function() {
+let update_target = () => {
   if (stims.length >= delay) {
     target = stims.slice(-delay)[0]
   } else {
@@ -127,10 +131,10 @@ var update_target = function() {
   }
 };
 
-var getStim = function() {
-  var trial_type = target_trials.shift()
-  var targets = letters.filter(function(x) { return x.toLowerCase() == target.toLowerCase()})
-  var non_targets = letters.filter(function(x) { return x.toLowerCase() != target.toLowerCase()})
+let getStim = () => {
+  let trial_type = target_trials.shift()
+  let targets = letters.filter((x) => x.toLowerCase() == target.toLowerCase())
+  let non_targets = letters.filter((x) => x.toLowerCase() != target.toLowerCase())
   if (trial_type === 'target') {
     curr_stim = randomDraw(targets)
   } else {
@@ -140,7 +144,7 @@ var getStim = function() {
   return '<div class = "centerbox"><div class = "center-text"><p>' + curr_stim + '</p></div></div>'
 }
 
-var getData = function() {
+let getData = () => {
   return {
     trial_id: "stim",
     exp_stage: "adaptive",
@@ -150,49 +154,50 @@ var getData = function() {
   }
 }
 
-var getText = function() {
+let getText = () => {
   return '<div class = "centerbox"><p class = "block-text">In these next blocks, you should press the left arrow key when the current letter matches the letter that appeared ' +
   delay +
     ' trials before. Otherwise press the down arrow key</p><p class = center-block-text>Press <strong>enter</strong> to begin.</p></div>'
 }
 
 /* ************************************ */
-/* Define experimental variables */
+/* Define experimental letiables */
 /* ************************************ */
-// generic task variables
+// generic task letiables
 // TODO: check what's this being used for
-var credit_var = true //default to true
+let credit_let = true //default to true
 
-// task specific variables
-var letters = 'bBdDgGtTvV'.split("")
-// var num_blocks = 20 // number of adaptive blocks
-// var base_num_trials = 20 // total num_trials = base + load 
-// var control_num_trials = 42
+// task specific letiables
+let letters = 'bBdDgGtTvV'.split("")
+// let num_blocks = 20 // number of adaptive blocks
+// let base_num_trials = 20 // total num_trials = base + load 
+// let control_num_trials = 42
 // TODO: uncomment the above 3 lines and delete the 3 below
-var num_blocks = 2 // number of adaptive blocks
-var base_num_trials = 2 // total num_trials = base + load 
-var control_num_trials = 3
-var control_before = Math.round(Math.random()) //0 control comes before test, 1, after
-var block_acc = 0 // record block accuracy to determine next blocks delay
-var delay = 2 // starting delay
-var trials_left = 0 // counter used by adaptive_test_node
-var target_trials = [] // array defining whether each trial in a block is a target trial
-var current_trial = 0
-var current_block = 0  
-var block_trial = 0
-var target = ""
-var curr_stim = ''
-var stims = [] //hold stims per block
+let num_blocks = 7 // number of adaptive blocks
+let base_num_trials = 7 // total num_trials = base + load 
+let control_num_trials = 7
+let control_before = Math.round(Math.random()) //0 control comes before test, 1, after
+let block_acc = 0 // record block accuracy to determine next blocks delay
+let delay = 2 // starting delay
+let trials_left = 0 // counter used by adaptive_test_node
+let target_trials = [] // array defining whether each trial in a block is a target trial
+let current_trial = 0
+let current_block = 0  
+let block_trial = 0
+let target = ""
+let curr_stim = ''
+let stims = [] //hold stims per block
 
 /* ************************************ */
 /* Set up jsPsych blocks */
 /* ************************************ */
 //Set up post task questionnaire
-var post_task_block = {
+let post_task_block = {
   type: jsPsychSurveyText,
   data: {
     exp_id: "adaptive_n_back",
-    trial_id: "post task questions"
+    trial_id: "post task questions",
+    save_trial: true
   },
   questions: [
     { prompt: "Please summarize what you were asked to do in this task." },
@@ -203,9 +208,9 @@ var post_task_block = {
 };
 
 /* define static blocks */
-var feedback_instruct_text =
+let feedback_instruct_text =
   'Welcome to the experiment. This task will take around 20 minutes. Press <strong>enter</strong> to begin.'
-var feedback_instruct_block = {
+let feedback_instruct_block = {
   type: jsPsychHtmlKeyboardResponse,
   data: {
     trial_id: 'instruction'
@@ -214,7 +219,7 @@ var feedback_instruct_block = {
   choices: ['Enter']
 };
 
-var end_block = {
+let end_block = {
   type: jsPsychHtmlKeyboardResponse,
   stimulus: '<div class = "centerbox"><p class = "center-block-text">Thanks for completing this task!</p><p class = center-block-text>Press <strong>enter</strong> to begin.</p></div>',
   choices: ['Enter'],
@@ -225,7 +230,7 @@ var end_block = {
   on_finish: assessPerformance
 };
 
-var start_practice_block = {
+let start_practice_block = {
   type: jsPsychHtmlKeyboardResponse,
   stimulus: '<div class = "centerbox"><p class = "block-text">Starting practice. During practice, you should press the left arrow key when the current letter matches the letter that appeared 1 trial before. Otherwise press the down arrow key</p><p class = center-block-text>You will receive feedback about whether you were correct or not during practice. There will be no feedback during the main experiment. Press <strong>enter</strong> to begin.</p></div>',
   choices: ['Enter'],
@@ -234,7 +239,7 @@ var start_practice_block = {
   },
 };
 
-var update_delay_block = {
+let update_delay_block = {
   type: jsPsychCallFunction,
   func: update_delay,
   data: {
@@ -243,7 +248,7 @@ var update_delay_block = {
   timing_post_trial: 0
 }
 
-var update_target_block = {
+let update_target_block = {
   type: jsPsychCallFunction,
   func: update_target,
   data: {
@@ -252,20 +257,20 @@ var update_target_block = {
   timing_post_trial: 0
 }
 
-var start_control_block = {
+let start_control_block = {
   type: jsPsychHtmlKeyboardResponse,
   stimulus: '<div class = "centerbox"><p class = "block-text">In this block you do not have to match letters to previous letters. Instead, press the left arrow key everytime you see a "t" or "T" and the down arrow key for all other letters.</p><p class = center-block-text>Press <strong>enter</strong> to begin.</p></div>',
   choices: ['Enter'],
   data: {
     trial_id: "instruction"
   },
-  on_finish: function() {
+  on_finish: () => {
     target_trials = jsPsych.randomization.repeat(['target','0', '0'], Math.round(control_num_trials/3)).slice(0,control_num_trials)
     target = 't'
   }
 };
 
-var start_adaptive_block = {
+let start_adaptive_block = {
   type: jsPsychHtmlKeyboardResponse,
   data: {
     exp_stage: "adaptive",
@@ -273,16 +278,16 @@ var start_adaptive_block = {
   },
   stimulus: getText,
   choices: ['Enter'],
-  on_finish: function() {
+  on_finish: () => {
     block_trial = 0
     stims = []
     trials_left = base_num_trials + delay
     target_trials = []
-    for (var i = 0; i < delay; i++) {
+    for (let i = 0; i < delay; i++) {
       target_trials.push('0')
     }
-    var trials_to_add = []
-    for ( var j = 0; j < (trials_left - delay); j++) {
+    let trials_to_add = []
+    for ( let j = 0; j < (trials_left - delay); j++) {
       if (j < (Math.round(base_num_trials/3))) {
         trials_to_add.push('target')
       } else {
@@ -295,26 +300,26 @@ var start_adaptive_block = {
   }
 };
 
-var adaptive_block = {
+let adaptive_block = {
   type: jsPsychHtmlKeyboardResponse,
   stimulus: getStim,
   data: getData,
   choices: ['ArrowLeft', 'ArrowRight'],
-  on_finish: function(data) {
+  on_finish: (data) => {
     record_acc(data);
   }
 };
 
-var feedback_trial = {
+let feedback_trial = {
   type: jsPsychHtmlKeyboardResponse,
   choices: 'NO_KEYS',
   trial_duration: 1000,
-  stimulus: function(){
+  stimulus: () =>{
     // The feedback stimulus is a dynamic parameter because we can't know in advance whether
     // the stimulus should be 'correct' or 'incorrect'.
     // Instead, this function will check the accuracy of the last response and use that information to set
     // the stimulus value on each trial.
-    var last_trial_correct = jsPsych.data.get().last(1).values()[0].correct;
+    let last_trial_correct = jsPsych.data.get().last(1).values()[0].correct;
     if(last_trial_correct){
     return '<div class = "centerbox"><div style="color:green;font-size:60px"; class = center-text>Correct!</div></div>'; // the parameter value has to be returned from the function
     } else {
@@ -325,8 +330,8 @@ var feedback_trial = {
 
 //Setup 1-back practice
 const practice_trials = []
-for (var i = 0; i < (base_num_trials + 1); i++) {
-  var stim = randomDraw(letters)
+for (let i = 0; i < (base_num_trials + 1); i++) {
+  let stim = randomDraw(letters)
   stims.push(stim)
   if (i >= 1) {
     target = stims[i - 1]
@@ -339,10 +344,11 @@ for (var i = 0; i < (base_num_trials + 1); i++) {
       trial_id: "stim",
       exp_stage: "practice",
       stim: stim,
-      target: target
+      target: target,
+      save_trial: true,
     },
     choices: ['ArrowLeft', 'ArrowRight'],
-    on_finish: function(data){
+    on_finish: (data) => {
       // Score the response as correct or incorrect.
       const matching_response = stim.toLowerCase(0) == target.toLowerCase();
       if (matching_response)
@@ -356,9 +362,9 @@ for (var i = 0; i < (base_num_trials + 1); i++) {
 }
 
 //Define control (0-back) block
-var control_trials = []
-for (var i = 0; i < control_num_trials; i++) {
-  var control_block = {
+let control_trials = []
+for (let i = 0; i < control_num_trials; i++) {
+  let control_block = {
     type: jsPsychHtmlKeyboardResponse,
     is_html: true,
     stimulus: getStim,
@@ -366,10 +372,11 @@ for (var i = 0; i < control_num_trials; i++) {
       trial_id: "stim",
       exp_stage: "control",
       load: 0,
+      save_trial: true,
       target: 't',
     },
     choices: ['ArrowLeft', 'ArrowRight'],
-    on_finish: function(data) {
+    on_finish: (data) => {
       record_acc(data);
       // Score the response as correct or incorrect.
       const stim = stims.slice(-1)[0];
@@ -384,9 +391,9 @@ for (var i = 0; i < control_num_trials; i++) {
   control_trials.push(control_block, feedback_trial)
 }
 
-var adaptive_test_node = {
+let adaptive_test_node = {
   timeline: [update_target_block, adaptive_block, feedback_trial],
-  loop_function: function() {
+  loop_function: () => {
     trials_left -= 1
     if (trials_left === 0) {
       return false
@@ -397,7 +404,7 @@ var adaptive_test_node = {
 }
 
 //Set up experiment
-var adaptive_n_back_experiment = []
+let adaptive_n_back_experiment = []
 adaptive_n_back_experiment.push(start_practice_block);
 adaptive_n_back_experiment = adaptive_n_back_experiment.concat(practice_trials);
 
@@ -405,7 +412,8 @@ if (control_before === 0) {
   adaptive_n_back_experiment.push(start_control_block)
   adaptive_n_back_experiment = adaptive_n_back_experiment.concat(control_trials)
 }
-for (var b = 0; b < num_blocks; b++) { 
+
+for (let b = 0; b < num_blocks; b++) { 
   adaptive_n_back_experiment.push(start_adaptive_block)
   adaptive_n_back_experiment.push(adaptive_test_node)
   adaptive_n_back_experiment.push(update_delay_block)
@@ -415,6 +423,7 @@ if (control_before == 1) {
   adaptive_n_back_experiment.push(start_control_block)
   adaptive_n_back_experiment = adaptive_n_back_experiment.concat(control_trials)
 }
+
 //Set up control
 adaptive_n_back_experiment.push(post_task_block)
 adaptive_n_back_experiment.push(end_block)

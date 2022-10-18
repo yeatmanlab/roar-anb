@@ -1,7 +1,7 @@
 import { log } from './logger';
 
 // eslint-disable-next-line no-undef
-const rootDoc = ROAR_DB_DOC === "production" ? ["prod", "roar-prod"] : ["dev", "test-roar-app"];
+const rootDoc = ROAR_DB_DOC === "production" ? ["prod", "roar-prod"] : ["dev", "roar-anb"];
 
 /* eslint-disable import/prefer-default-export */
 export const roarConfig = {
