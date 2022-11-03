@@ -12,8 +12,13 @@ import './css/roar.css';
 
 // Local modules
 import { initConfig, initRoarJsPsych, initRoarTimeline } from './config';
-
 import { allTargets, preloadImages } from './loadAssets';
+import {
+  CORRECT_KEY_PRESS,
+  CORRECT_KEY_TEXT,
+  WRONG_KEY_PRESS,
+  WRONG_KEY_TEXT
+} from './utils';
 
 // ---------Initialize the jsPsych object and the timeline---------
 const config = await initConfig();
@@ -86,12 +91,12 @@ let record_acc = (data) => {
   let stim_lower = curr_stim.toLowerCase(0)
   let key = data.response
   let correct = false;
-  if (stim_lower == target_lower && jsPsych.pluginAPI.compareKeys(key, "ArrowLeft")) {
+  if (stim_lower == target_lower && jsPsych.pluginAPI.compareKeys(key, CORRECT_KEY_PRESS)) {
     correct = true
     if (block_trial >= delay) {
       block_acc += 1
     }
-  } else if (stim_lower != target_lower && jsPsych.pluginAPI.compareKeys(key, "ArrowRight")) {
+  } else if (stim_lower != target_lower && jsPsych.pluginAPI.compareKeys(key, WRONG_KEY_PRESS)) {
     correct = true
     if (block_trial >= delay) {
       block_acc += 1
@@ -155,9 +160,7 @@ let getData = () => {
 }
 
 let getText = () => {
-  return '<div class = "centerbox"><p class = "block-text">In these next blocks, you should press the left arrow key when the current letter matches the letter that appeared ' +
-  delay +
-    ' trials before. Otherwise press the down arrow key</p><p class = center-block-text>Press <strong>enter</strong> to begin.</p></div>'
+  return `<div class = "centerbox"><p class = "block-text">In these next blocks, you should press the ${CORRECT_KEY_TEXT} when the current letter matches the letter that appeared ${delay} trials before. Otherwise press the ${WRONG_KEY_TEXT}</p><p class = "center-block-text">Press <strong>enter</strong> to begin.</p></div>`
 }
 
 /* ************************************ */
@@ -232,7 +235,7 @@ let end_block = {
 
 let start_practice_block = {
   type: jsPsychHtmlKeyboardResponse,
-  stimulus: '<div class = "centerbox"><p class = "block-text">Starting practice. During practice, you should press the left arrow key when the current letter matches the letter that appeared 1 trial before. Otherwise press the down arrow key</p><p class = center-block-text>You will receive feedback about whether you were correct or not during practice. There will be no feedback during the main experiment. Press <strong>enter</strong> to begin.</p></div>',
+  stimulus: `<div class = "centerbox"><p class = "block-text">Starting practice. During practice, you should press the ${CORRECT_KEY_TEXT} when the current letter matches the letter that appeared 1 trial before. Otherwise press the ${WRONG_KEY_TEXT}</p><p class = center-block-text>You will receive feedback about whether you were correct or not during practice. There will be no feedback during the main experiment. Press <strong>enter</strong> to begin.</p></div>`,
   choices: ['Enter'],
   data: {
     trial_id: "instruction",
@@ -259,7 +262,7 @@ let update_target_block = {
 
 let start_control_block = {
   type: jsPsychHtmlKeyboardResponse,
-  stimulus: '<div class = "centerbox"><p class = "block-text">In this block you do not have to match letters to previous letters. Instead, press the left arrow key everytime you see a "t" or "T" and the down arrow key for all other letters.</p><p class = center-block-text>Press <strong>enter</strong> to begin.</p></div>',
+  stimulus: `<div class = "centerbox"><p class = "block-text">In this block you do not have to match letters to previous letters. Instead, press the ${CORRECT_KEY_TEXT} everytime you see a "t" or "T" and the ${WRONG_KEY_TEXT} for all other letters.</p><p class = center-block-text>Press <strong>enter</strong> to begin.</p></div>`,
   choices: ['Enter'],
   data: {
     trial_id: "instruction"
@@ -304,7 +307,7 @@ let adaptive_block = {
   type: jsPsychHtmlKeyboardResponse,
   stimulus: getStim,
   data: getData,
-  choices: ['ArrowLeft', 'ArrowRight'],
+  choices: [CORRECT_KEY_PRESS, WRONG_KEY_PRESS],
   on_finish: (data) => {
     record_acc(data);
   }
@@ -347,14 +350,14 @@ for (let i = 0; i < (base_num_trials + 1); i++) {
       target: target,
       save_trial: true,
     },
-    choices: ['ArrowLeft', 'ArrowRight'],
+    choices: [CORRECT_KEY_PRESS, WRONG_KEY_PRESS],
     on_finish: (data) => {
       // Score the response as correct or incorrect.
       const matching_response = stim.toLowerCase(0) == target.toLowerCase();
       if (matching_response)
-        data.correct = jsPsych.pluginAPI.compareKeys(data.response, "ArrowLeft");
+        data.correct = jsPsych.pluginAPI.compareKeys(data.response, CORRECT_KEY_PRESS);
       else
-        data.correct = jsPsych.pluginAPI.compareKeys(data.response, "ArrowRight");
+        data.correct = jsPsych.pluginAPI.compareKeys(data.response, WRONG_KEY_PRESS);
     }
   };
   
@@ -375,16 +378,16 @@ for (let i = 0; i < control_num_trials; i++) {
       save_trial: true,
       target: 't',
     },
-    choices: ['ArrowLeft', 'ArrowRight'],
+    choices: [CORRECT_KEY_PRESS, WRONG_KEY_PRESS],
     on_finish: (data) => {
       record_acc(data);
       // Score the response as correct or incorrect.
       const stim = stims.slice(-1)[0];
       const matching_response = stim.toLowerCase() == 't';
       if (matching_response)
-        data.correct = jsPsych.pluginAPI.compareKeys(data.response, "ArrowLeft");
+        data.correct = jsPsych.pluginAPI.compareKeys(data.response, CORRECT_KEY_PRESS);
       else
-        data.correct = jsPsych.pluginAPI.compareKeys(data.response, "ArrowRight");
+        data.correct = jsPsych.pluginAPI.compareKeys(data.response, WRONG_KEY_PRESS);
     }
   };
   
