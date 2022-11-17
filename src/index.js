@@ -33,7 +33,8 @@ let credit_let = true; // default to true
 
 // task specific variables
 const letters = 'bBdDgGtTvV'.split("");
-// TODO: discuss with the team if we should reduce some of these values, 20 blocks with 42 control trials seem a lot.
+// TODO: discuss with the team if we should reduce some of these values,
+// TODO: 20 blocks with 42 control trials seem a lot.
 const num_blocks = 20; // number of adaptive blocks
 const base_num_trials = 20; // total num_trials = base + load
 const control_num_trials = 42;
@@ -101,7 +102,7 @@ function assessPerformance() {
 }
 
 const getInstructFeedback = () => {
-  let feedback_instruct_text = 'Welcome to the experiment. This task will take around 20 minutes. Press <strong>enter</strong> to begin.';
+  const feedback_instruct_text = 'Welcome to the experiment. This task will take around 20 minutes. Press <strong>enter</strong> to begin.';
   return `<div class = "centerbox"><p class = center-block-text>${feedback_instruct_text}</p></div>`;
 };
 
