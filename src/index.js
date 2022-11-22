@@ -54,6 +54,12 @@ const blockConfig = {
 /* ************************************ */
 /* Define helper functions */
 /* ************************************ */
+export const updateProgressBar = () => {
+  const total_blocks = NUM_BLOCKS + 2;  // additional blocks for practice and control
+  const curr_progress_bar_value = jsPsych.getProgressBarCompleted();
+  jsPsych.setProgressBar(curr_progress_bar_value + 1 / total_blocks);
+};
+
 function assessPerformance() {
   /* 
    * Function to calculate the "credit_let", which is a boolean
@@ -248,6 +254,15 @@ const update_delay_block = {
   timing_post_trial: 0,
 };
 
+const update_progress_bar_block = {
+  type: jsPsychCallFunction,
+  func: updateProgressBar,
+  data: {
+    trial_id: "update_progress_bar",
+  },
+  timing_post_trial: 0,
+};
+
 const update_target_block = {
   type: jsPsychCallFunction,
   func: update_target,
@@ -412,21 +427,25 @@ let adaptive_n_back_experiment = [];
 adaptive_n_back_experiment.push(instruction_node);
 adaptive_n_back_experiment.push(start_practice_block);
 adaptive_n_back_experiment = adaptive_n_back_experiment.concat(practice_trials);
+adaptive_n_back_experiment.push(update_progress_bar_block);
 
 if (control_before === 0) {
   adaptive_n_back_experiment.push(start_control_block);
   adaptive_n_back_experiment = adaptive_n_back_experiment.concat(control_trials);
+  adaptive_n_back_experiment.push(update_progress_bar_block);
 }
 
 for (let b = 0; b < NUM_BLOCKS; b++) {
   adaptive_n_back_experiment.push(start_adaptive_block);
   adaptive_n_back_experiment.push(adaptive_test_node);
   adaptive_n_back_experiment.push(update_delay_block);
+  adaptive_n_back_experiment.push(update_progress_bar_block);
 }
 
 if (control_before === 1) {
   adaptive_n_back_experiment.push(start_control_block);
   adaptive_n_back_experiment = adaptive_n_back_experiment.concat(control_trials);
+  adaptive_n_back_experiment.push(update_progress_bar_block);
 }
 
 // Set up control
