@@ -428,44 +428,43 @@ const adaptive_test_node = {
   },
 };
 
-// Set up experiment
-let adaptive_n_back_experiment = [];
-adaptive_n_back_experiment.push(preloadAudio);
-adaptive_n_back_experiment.push(instruction_node);
-adaptive_n_back_experiment.push(start_practice_block);
-adaptive_n_back_experiment = adaptive_n_back_experiment.concat(practice_trials);
-adaptive_n_back_experiment.push(update_progress_bar_block);
-
-if (control_before === 0) {
-  adaptive_n_back_experiment.push(start_control_block);
-  adaptive_n_back_experiment = adaptive_n_back_experiment.concat(control_trials);
-  adaptive_n_back_experiment.push(update_progress_bar_block);
-}
-
-for (let b = 0; b < NUM_BLOCKS; b++) {
-  adaptive_n_back_experiment.push(start_adaptive_block);
-  adaptive_n_back_experiment.push(adaptive_test_node);
-  adaptive_n_back_experiment.push(update_delay_block);
-  adaptive_n_back_experiment.push(update_progress_bar_block);
-}
-
-if (control_before === 1) {
-  adaptive_n_back_experiment.push(start_control_block);
-  adaptive_n_back_experiment = adaptive_n_back_experiment.concat(control_trials);
-  adaptive_n_back_experiment.push(update_progress_bar_block);
-}
-
-// Set up control
-adaptive_n_back_experiment.push(post_task_block);
-adaptive_n_back_experiment.push(end_block);
-
 const exit_fullscreen = {
   type: jsPsychFullScreen,
   fullscreen_mode: false,
   delay_after: 0,
 };
 
-timeline.push(...adaptive_n_back_experiment);
+// Set up experiment
+let timeline = [];
+
+timeline.push(preloadAudio);
+timeline.push(instruction_node);
+timeline.push(start_practice_block);
+timeline = timeline.concat(practice_trials);
+timeline.push(update_progress_bar_block);
+
+if (control_before === 0) {
+  timeline.push(start_control_block);
+  timeline = timeline.concat(control_trials);
+  timeline.push(update_progress_bar_block);
+}
+
+for (let b = 0; b < NUM_BLOCKS; b++) {
+  timeline.push(start_adaptive_block);
+  timeline.push(adaptive_test_node);
+  timeline.push(update_delay_block);
+  timeline.push(update_progress_bar_block);
+}
+
+if (control_before === 1) {
+  timeline.push(start_control_block);
+  timeline = timeline.concat(control_trials);
+  timeline.push(update_progress_bar_block);
+}
+
+// Set up control
+timeline.push(post_task_block);
+timeline.push(end_block);
 timeline.push(exit_fullscreen);
 
 jsPsych.run(timeline);
