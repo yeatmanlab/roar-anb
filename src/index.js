@@ -25,6 +25,8 @@ import {
   NUM_BLOCKS,
   NUM_TRIALS,
   CONTROL_NUM_TRIALS,
+  SHOW_CONTROL_TRIALS,
+  STIMULUS_FONT_SIZE
 } from './utils';
 
 // ---------Initialize the jsPsych object and the timeline---------
@@ -185,7 +187,7 @@ const getStim = () => {
     curr_stim = randomDraw(non_targets);
   }
   stims.push(curr_stim);
-  return `<div class = "centerbox"><div class = "center-text"><p>${curr_stim}</p></div></div>`;
+  return drawStim(curr_stim);
 };
 
 /* ************************************ */
@@ -219,7 +221,17 @@ const feedback_instruct_block = {
 
 const instructions_block = {
   type: jsPsychHtmlKeyboardResponse,
-  stimulus: `<div class = "centerbox"><p class = "block-text">In this experiment you will see a sequence of letters presented one at a time. Your job is to respond by pressing the <strong>${CORRECT_KEY_TEXT}</strong> when the letter matches the same letter that occured some number of trials before (the number of trials is called the "delay"), otherwise you should press the <strong>${WRONG_KEY_TEXT}</strong>. The letters will be both lower and upper case. You should ignore the case (so "t" matches "T").</p><p class = block-text>The specific delay you should pay attention to will differ between blocks of trials, and you will be told the delay before starting a block.</p><p class = block-text>For instance, if the delay is 2, you are supposed to press the ${CORRECT_KEY_TEXT} when the current letter matches the letter that occurred 2 trials ago. If you saw the sequence: g...G...v...T...b...t...b, you would press the ${CORRECT_KEY_TEXT} on the last "t" and the last "b" and the ${WRONG_KEY_TEXT} for every other letter.</p><p class = block-text>On one block of trials there will be no delay. On this block you will be instructed to press the ${CORRECT_KEY_TEXT} to the presentation of a specific letter on that trial. For instance, the specific letter may be "t", in which case you would press the ${CORRECT_KEY_TEXT} to "t" or "T". Press <strong>enter</strong> to continue.</p></div>`,
+  stimulus: (() => {
+    let html = `<div class = "centerbox"><p class = "block-text">In this experiment you will see a sequence of letters presented one at a time. Your job is to respond by pressing the <strong>${CORRECT_KEY_TEXT}</strong> when the letter matches the same letter that occured some number of trials before (the number of trials is called the "delay"), otherwise you should press the <strong>${WRONG_KEY_TEXT}</strong>. The letters will be both lower and upper case. You should ignore the case (so "t" matches "T").</p><p class = block-text>The specific delay you should pay attention to will differ between blocks of trials, and you will be told the delay before starting a block.</p><p class = block-text>For instance, if the delay is 2, you are supposed to press the ${CORRECT_KEY_TEXT} when the current letter matches the letter that occurred 2 trials ago. If you saw the sequence: g...G...v...T...b...t...b, you would press the ${CORRECT_KEY_TEXT} on the last "t" and the last "b" and the ${WRONG_KEY_TEXT} for every other letter.</p>`;
+    
+    if (SHOW_CONTROL_TRIALS) {
+      html += `<p class = block-text>On one block of trials there will be no delay. On this block you will be instructed to press the ${CORRECT_KEY_TEXT} to the presentation of a specific letter on that trial. For instance, the specific letter may be "t", in which case you would press the ${CORRECT_KEY_TEXT} to "t" or "T".</p>`;
+    }
+    
+    html += `<p class = block-text>Press <strong>enter</strong> to continue.</p></div>`;
+    
+    return html;
+  })(),
   data: {
     trial_id: 'instruction',
   },
@@ -354,6 +366,10 @@ const feedback_trial = {
   },
 };
 
+function drawStim(stim) {
+  return `<div class = "centerbox"><div class = center-text><p style="font-size: ${STIMULUS_FONT_SIZE}px">${stim}</p></div></div>`
+}
+
 // Setup 1-back practice
 const practice_trials = [];
 for (let i = 0; i < (NUM_TRIALS + 1); i++) {
@@ -365,7 +381,7 @@ for (let i = 0; i < (NUM_TRIALS + 1); i++) {
   const practice_block = {
     type: jsPsychHtmlKeyboardResponse,
     is_html: true,
-    stimulus: `<div class = "centerbox"><div class = center-text><p>${stim}</p></div></div>`,
+    stimulus: drawStim(stim),
     data: {
       trial_id: "stim",
       exp_stage: "practice",
@@ -443,7 +459,7 @@ adaptive_n_back_experiment.push(start_practice_block);
 adaptive_n_back_experiment = adaptive_n_back_experiment.concat(practice_trials);
 adaptive_n_back_experiment.push(update_progress_bar_block);
 
-if (control_before === 0) {
+if (SHOW_CONTROL_TRIALS && control_before === 0) {
   adaptive_n_back_experiment.push(start_control_block);
   adaptive_n_back_experiment = adaptive_n_back_experiment.concat(control_trials);
   adaptive_n_back_experiment.push(update_progress_bar_block);
@@ -456,7 +472,7 @@ for (let b = 0; b < NUM_BLOCKS; b++) {
   adaptive_n_back_experiment.push(update_progress_bar_block);
 }
 
-if (control_before === 1) {
+if (SHOW_CONTROL_TRIALS && control_before === 1) {
   adaptive_n_back_experiment.push(start_control_block);
   adaptive_n_back_experiment = adaptive_n_back_experiment.concat(control_trials);
   adaptive_n_back_experiment.push(update_progress_bar_block);
