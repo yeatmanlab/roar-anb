@@ -10,7 +10,7 @@ import {
   WRONG_KEY_PRESS,
   WRONG_KEY_TEXT,
   audioContent,
-  preloadAudio
+  preloadAudio,
 } from 'roar-utils';
 
 // Import necessary for async in the top level of the experiment script
@@ -54,24 +54,24 @@ let stims = []; // hold stims per block
 const blockConfig = {
   adaptive: { trial_id: "stim", exp_stage: "adaptive" },
   control: { trial_id: "stim", exp_stage: "control" },
-}
+};
 
 /* ************************************ */
 /* Define helper functions */
 /* ************************************ */
-export const updateProgressBar = () => {
-  const total_blocks = NUM_BLOCKS + 2;  // additional blocks for practice and control
+const updateProgressBar = () => {
+  const total_blocks = NUM_BLOCKS + 2; // additional blocks for practice and control
   const curr_progress_bar_value = jsPsych.getProgressBarCompleted();
   jsPsych.setProgressBar(curr_progress_bar_value + 1 / total_blocks);
 };
 
 function assessPerformance() {
-  /* 
+  /*
    * Function to calculate the "credit_let", which is a boolean
    * used to credit individual experiments in expfactory.
    */
   const experiment_data = jsPsych.data.get().filter([
-    blockConfig.adaptive, blockConfig.control
+    blockConfig.adaptive, blockConfig.control,
   ]);
   let missed_count = 0;
   let trial_count = 0;
@@ -345,11 +345,12 @@ const feedback_trial = {
     // Instead, this function will check the accuracy of the last response
     // and use that information to set the stimulus value on each trial.
     const last_trial_correct = jsPsych.data.get().last(1).values()[0].correct;
-    console.log(audioContent);
-    if (last_trial_correct)
-      return audioContent.feedbackCorrect; // the parameter value has to be returned from the function
-    else
-      return audioContent.feedbackIncorrect; // the parameter value has to be returned from the function
+    if (last_trial_correct) {
+      // the parameter value has to be returned from the function
+      return audioContent.feedbackCorrect;
+    }
+    // the parameter value has to be returned from the function
+    return audioContent.feedbackIncorrect;
   },
 };
 
@@ -435,36 +436,37 @@ const exit_fullscreen = {
 };
 
 // Set up experiment
-let timeline = [];
-
-timeline.push(preloadAudio);
-timeline.push(instruction_node);
-timeline.push(start_practice_block);
-timeline = timeline.concat(practice_trials);
-timeline.push(update_progress_bar_block);
+let adaptive_n_back_experiment = [];
+adaptive_n_back_experiment.push(preloadAudio);
+adaptive_n_back_experiment.push(instruction_node);
+adaptive_n_back_experiment.push(start_practice_block);
+adaptive_n_back_experiment = adaptive_n_back_experiment.concat(practice_trials);
+adaptive_n_back_experiment.push(update_progress_bar_block);
 
 if (control_before === 0) {
-  timeline.push(start_control_block);
-  timeline = timeline.concat(control_trials);
-  timeline.push(update_progress_bar_block);
+  adaptive_n_back_experiment.push(start_control_block);
+  adaptive_n_back_experiment = adaptive_n_back_experiment.concat(control_trials);
+  adaptive_n_back_experiment.push(update_progress_bar_block);
 }
 
 for (let b = 0; b < NUM_BLOCKS; b++) {
-  timeline.push(start_adaptive_block);
-  timeline.push(adaptive_test_node);
-  timeline.push(update_delay_block);
-  timeline.push(update_progress_bar_block);
+  adaptive_n_back_experiment.push(start_adaptive_block);
+  adaptive_n_back_experiment.push(adaptive_test_node);
+  adaptive_n_back_experiment.push(update_delay_block);
+  adaptive_n_back_experiment.push(update_progress_bar_block);
 }
 
 if (control_before === 1) {
-  timeline.push(start_control_block);
-  timeline = timeline.concat(control_trials);
-  timeline.push(update_progress_bar_block);
+  adaptive_n_back_experiment.push(start_control_block);
+  adaptive_n_back_experiment = adaptive_n_back_experiment.concat(control_trials);
+  adaptive_n_back_experiment.push(update_progress_bar_block);
 }
 
 // Set up control
-timeline.push(post_task_block);
-timeline.push(end_block);
+adaptive_n_back_experiment.push(post_task_block);
+adaptive_n_back_experiment.push(end_block);
+
+timeline.push(...adaptive_n_back_experiment);
 timeline.push(exit_fullscreen);
 
 jsPsych.run(timeline);
