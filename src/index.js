@@ -3,6 +3,15 @@ import jsPsychFullScreen from '@jspsych/plugin-fullscreen';
 import jsPsychHtmlKeyboardResponse from '@jspsych/plugin-html-keyboard-response';
 import jsPsychCallFunction from '@jspsych/plugin-call-function';
 import jsPsychSurveyText from '@jspsych/plugin-survey-text';
+import jsPsychAudioKeyboardResponse from "@jspsych/plugin-audio-keyboard-response";
+import {
+  CORRECT_KEY_PRESS,
+  CORRECT_KEY_TEXT,
+  WRONG_KEY_PRESS,
+  WRONG_KEY_TEXT,
+  audioContent,
+  preloadAudio
+} from 'roar-utils';
 
 // Import necessary for async in the top level of the experiment script
 import 'regenerator-runtime/runtime';
@@ -13,10 +22,6 @@ import './css/roar.css';
 // Local modules
 import { initConfig, initRoarJsPsych, initRoarTimeline } from './config';
 import {
-  CORRECT_KEY_PRESS,
-  CORRECT_KEY_TEXT,
-  WRONG_KEY_PRESS,
-  WRONG_KEY_TEXT,
   NUM_BLOCKS,
   NUM_TRIALS,
   CONTROL_NUM_TRIALS,
@@ -331,7 +336,7 @@ const adaptive_block = {
 };
 
 const feedback_trial = {
-  type: jsPsychHtmlKeyboardResponse,
+  type: jsPsychAudioKeyboardResponse,
   choices: 'NO_KEYS',
   trial_duration: 1000,
   stimulus: () => {
@@ -340,10 +345,11 @@ const feedback_trial = {
     // Instead, this function will check the accuracy of the last response
     // and use that information to set the stimulus value on each trial.
     const last_trial_correct = jsPsych.data.get().last(1).values()[0].correct;
-    if (last_trial_correct) {
-      return '<div class = "centerbox"><div style="color:green;font-size:60px"; class = center-text>Correct!</div></div>'; // the parameter value has to be returned from the function
-    }
-    return '<div class = "centerbox"><div style="color:red;font-size:60px"; class = center-text>Wrong!</div></div>'; // the parameter value has to be returned from the function
+    console.log(audioContent);
+    if (last_trial_correct)
+      return audioContent.feedbackCorrect; // the parameter value has to be returned from the function
+    else
+      return audioContent.feedbackIncorrect; // the parameter value has to be returned from the function
   },
 };
 
@@ -424,6 +430,7 @@ const adaptive_test_node = {
 
 // Set up experiment
 let adaptive_n_back_experiment = [];
+adaptive_n_back_experiment.push(preloadAudio);
 adaptive_n_back_experiment.push(instruction_node);
 adaptive_n_back_experiment.push(start_practice_block);
 adaptive_n_back_experiment = adaptive_n_back_experiment.concat(practice_trials);
