@@ -156,3 +156,6 @@ xcuserdata/
 *.xcscmblueprint
 *.xccheckout
 Footer
+
+# Firebase hosting
+.firebase
