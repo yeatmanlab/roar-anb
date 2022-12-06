@@ -124,7 +124,7 @@ module.exports = (env, args) => {
     {
       plugins: [
         new HtmlWebpackPlugin({
-		  title: 'Roar Anb',
+          title: 'Roar Anb',
         }),
         new webpack.ids.HashedModuleIdsPlugin(), // so that file hashes don't change unexpectedly
         new webpack.DefinePlugin({ ROAR_DB_DOC: JSON.stringify(roarDbDoc) }),

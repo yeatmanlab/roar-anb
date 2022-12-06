@@ -144,7 +144,9 @@ export const initRoarJsPsych = (config) => {
   // Add a special error handler that writes javascript errors to a special trial
   // type in the Firestore database
   window.addEventListener('error', (e) => {
-    const { msg, url, lineNo, columnNo, error } = e;
+    const {
+      msg, url, lineNo, columnNo, error,
+    } = e;
 
     config.firekit?.writeTrial({
       task: 'error',
