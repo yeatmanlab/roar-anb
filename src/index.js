@@ -1,8 +1,10 @@
 // jsPsych imports
 import jsPsychFullScreen from '@jspsych/plugin-fullscreen';
+import jsPsychPreload from '@jspsych/plugin-preload';
 import jsPsychHtmlKeyboardResponse from '@jspsych/plugin-html-keyboard-response';
 import jsPsychCallFunction from '@jspsych/plugin-call-function';
 import jsPsychSurveyText from '@jspsych/plugin-survey-text';
+import jsPsychImageKeyboardResponse from "@jspsych/plugin-image-keyboard-response";
 import jsPsychAudioKeyboardResponse from "@jspsych/plugin-audio-keyboard-response";
 import {
   CORRECT_KEY_PRESS,
@@ -28,6 +30,9 @@ import {
   SHOW_CONTROL_TRIALS,
   STIMULUS_FONT_SIZE
 } from './utils';
+
+// assets
+import intro_image from '../assets/intro.png';
 
 // ---------Initialize the jsPsych object and the timeline---------
 const config = await initConfig();
@@ -445,15 +450,32 @@ const adaptive_test_node = {
   },
 };
 
+// trials to add gamification
+const preload_image = {
+  type: jsPsychPreload,
+  image: intro_image
+};
+
+const intro_node = {
+  type: jsPsychImageKeyboardResponse,
+  stimulus: intro_image
+};
+
 const exit_fullscreen = {
   type: jsPsychFullScreen,
   fullscreen_mode: false,
   delay_after: 0,
 };
 
-// Set up experiment
+
+// set up the experiment
 let adaptive_n_back_experiment = [];
+
+// preload assets
 adaptive_n_back_experiment.push(preloadAudio);
+adaptive_n_back_experiment.push(preload_image);
+
+adaptive_n_back_experiment.push(intro_node);
 adaptive_n_back_experiment.push(instruction_node);
 adaptive_n_back_experiment.push(start_practice_block);
 adaptive_n_back_experiment = adaptive_n_back_experiment.concat(practice_trials);
@@ -478,7 +500,7 @@ if (SHOW_CONTROL_TRIALS && control_before === 1) {
   adaptive_n_back_experiment.push(update_progress_bar_block);
 }
 
-// Set up control
+// set up control
 adaptive_n_back_experiment.push(post_task_block);
 adaptive_n_back_experiment.push(end_block);
 
