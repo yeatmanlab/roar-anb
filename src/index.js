@@ -134,12 +134,13 @@ const randomDraw = (lst) => {
 
 // calculates whether the last trial was correct and records the accuracy in data object
 const record_acc = (data) => {
-  let stim_lower = curr_stim, target_lower = data.target;
+  let stim_lower = curr_stim; let
+    target_lower = data.target;
   if (IGNORE_CASE) {
     stim_lower = curr_stim.toLowerCase();
     target_lower = data.target.toLowerCase();
   }
-  
+
   const key = data.response;
   let correct = false;
   if (stim_lower === target_lower && jsPsych.pluginAPI.compareKeys(key, CORRECT_KEY_PRESS)) {
@@ -187,21 +188,23 @@ const update_target = () => {
   }
 };
 
+function drawStim(stim) {
+  return `<div class = "centerbox"><div class = center-text><p style="font-size: ${STIMULUS_FONT_SIZE}px">${stim}</p></div></div>`;
+}
+
 const getStim = () => {
   const trial_type = target_trials.shift();
   const targets = letters.filter((x) => {
     if (IGNORE_CASE) {
       return x.toLowerCase() === target.toLowerCase();
-    } else {
-      return x === target;
     }
+    return x === target;
   });
   const non_targets = letters.filter((x) => {
     if (IGNORE_CASE) {
       return x.toLowerCase() !== target.toLowerCase();
-    } else {
-      return x !== target;
     }
+    return x !== target;
   });
   if (trial_type === 'target') {
     curr_stim = randomDraw(targets);
@@ -245,13 +248,13 @@ const instructions_block = {
   type: jsPsychHtmlKeyboardResponse,
   stimulus: (() => {
     let html = `<div class = "centerbox"><p class = "block-text">In this experiment you will see a sequence of letters presented one at a time. Your job is to respond by pressing the <strong>${CORRECT_KEY_TEXT}</strong> when the letter matches the same letter that occured some number of trials before (the number of trials is called the "delay"), otherwise you should press the <strong>${WRONG_KEY_TEXT}</strong>. The letters will be both lower and upper case. ${IGNORE_CASE ? 'You should ignore the case (so "t" matches "T"), the letters are case-insensitive' : 'You should care about the case (so "t" only matches "t" and not "T"), the letters are case-sensitive'}.</p><p class = block-text>The specific delay you should pay attention to will differ between blocks of trials, and you will be told the delay before starting a block.</p><p class = block-text>For instance, if the delay is 2, you are supposed to press the ${CORRECT_KEY_TEXT} when the current letter matches the letter that occurred 2 trials ago. If you saw the sequence: g...G...v...T...b...t...b, you would press the ${CORRECT_KEY_TEXT} on the last "t" and the last "b" and the ${WRONG_KEY_TEXT} for every other letter.</p>`;
-    
+
     if (SHOW_CONTROL_TRIALS) {
       html += `<p class = block-text>On one block of trials there will be no delay. On this block you will be instructed to press the ${CORRECT_KEY_TEXT} to the presentation of a specific letter on that trial. For instance, the specific letter may be "t", in which case you would press the ${CORRECT_KEY_TEXT} to "t"${IGNORE_CASE ? 'or "T"' : ''}.</p>`;
     }
-    
+
     html += `<p class = block-text>Press <strong>enter</strong> to continue.</p></div>`;
-    
+
     return html;
   })(),
   data: {
@@ -388,10 +391,6 @@ const feedback_trial = {
   },
 };
 
-function drawStim(stim) {
-  return `<div class = "centerbox"><div class = center-text><p style="font-size: ${STIMULUS_FONT_SIZE}px">${stim}</p></div></div>`
-}
-
 // Setup 1-back practice
 const practice_trials = [];
 for (let i = 0; i < (NUM_TRIALS + 1); i++) {
@@ -418,7 +417,7 @@ for (let i = 0; i < (NUM_TRIALS + 1); i++) {
       if (IGNORE_CASE === true) {
         matching_response = data.stim.toLowerCase() === data.target.toLowerCase();
       }
-      
+
       if (matching_response) {
         data.correct = jsPsych.pluginAPI.compareKeys(data.response, CORRECT_KEY_PRESS);
       } else {
@@ -452,7 +451,7 @@ for (let i = 0; i < CONTROL_NUM_TRIALS; i++) {
       if (IGNORE_CASE) {
         matching_response = stim.toLowerCase() === 't';
       }
-      
+
       if (matching_response) {
         data.correct = jsPsych.pluginAPI.compareKeys(data.response, CORRECT_KEY_PRESS);
       } else {
@@ -495,7 +494,6 @@ const intro_video_node = {
   trial_duration: null,
   choices: 'NO_KEYS ',
 };
-
 
 // set up the experiment
 let adaptive_n_back_experiment = [];
