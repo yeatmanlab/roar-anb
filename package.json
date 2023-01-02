@@ -43,6 +43,7 @@
     "@jspsych/plugin-image-keyboard-response": "^1.1.2",
     "@jspsych/plugin-preload": "^1.1.2",
     "@jspsych/plugin-survey-text": "^1.1.2",
+    "@jspsych/plugin-video-keyboard-response": "^1.1.2",
     "babel-loader": "^8.2.5",
     "file-loader": "^6.2.0",
     "jspsych": "^7.3.0",
