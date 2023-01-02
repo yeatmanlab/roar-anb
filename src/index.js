@@ -2,6 +2,7 @@
 import jsPsychFullScreen from '@jspsych/plugin-fullscreen';
 import jsPsychPreload from '@jspsych/plugin-preload';
 import jsPsychHtmlKeyboardResponse from '@jspsych/plugin-html-keyboard-response';
+import videoKeyboardResponse from '@jspsych/plugin-video-keyboard-response';
 import jsPsychCallFunction from '@jspsych/plugin-call-function';
 import jsPsychSurveyText from '@jspsych/plugin-survey-text';
 import jsPsychImageKeyboardResponse from "@jspsych/plugin-image-keyboard-response";
@@ -33,6 +34,7 @@ import {
 
 // assets
 import intro_image from '../assets/intro.png';
+import intro_video from '../assets/intro-video.mp4';
 
 // ---------Initialize the jsPsych object and the timeline---------
 const config = await initConfig();
@@ -451,12 +453,17 @@ const adaptive_test_node = {
 };
 
 // trials to add gamification
-const preload_image = {
+const preload_intro_image = {
   type: jsPsychPreload,
   image: intro_image
 };
 
-const intro_node = {
+const preload_intro_video = {
+  type: jsPsychPreload,
+  video: intro_video,
+};
+
+const intro_image_node = {
   type: jsPsychImageKeyboardResponse,
   stimulus: intro_image
 };
@@ -467,15 +474,27 @@ const exit_fullscreen = {
   delay_after: 0,
 };
 
+const intro_video_node = {
+  type: videoKeyboardResponse,
+  stimulus: [intro_video],
+  trial_ends_after_video: true,
+  response_allowed_while_playing: true,
+  trial_duration: null,
+  choices: 'NO_KEYS ',
+};
+
 
 // set up the experiment
 let adaptive_n_back_experiment = [];
 
 // preload assets
 adaptive_n_back_experiment.push(preloadAudio);
-adaptive_n_back_experiment.push(preload_image);
+adaptive_n_back_experiment.push(preload_intro_image);
+adaptive_n_back_experiment.push(preload_intro_video);
 
-adaptive_n_back_experiment.push(intro_node);
+// adaptive_n_back_experiment.push(intro_image_node);
+adaptive_n_back_experiment.push(intro_video_node);
+
 adaptive_n_back_experiment.push(instruction_node);
 adaptive_n_back_experiment.push(start_practice_block);
 adaptive_n_back_experiment = adaptive_n_back_experiment.concat(practice_trials);
