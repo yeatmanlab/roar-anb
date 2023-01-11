@@ -2,9 +2,9 @@
 import jsPsychFullScreen from '@jspsych/plugin-fullscreen';
 import jsPsychPreload from '@jspsych/plugin-preload';
 import jsPsychHtmlKeyboardResponse from '@jspsych/plugin-html-keyboard-response';
+import videoKeyboardResponse from '@jspsych/plugin-video-keyboard-response';
 import jsPsychCallFunction from '@jspsych/plugin-call-function';
 import jsPsychSurveyText from '@jspsych/plugin-survey-text';
-import jsPsychImageKeyboardResponse from "@jspsych/plugin-image-keyboard-response";
 import jsPsychAudioKeyboardResponse from "@jspsych/plugin-audio-keyboard-response";
 import {
   CORRECT_KEY_PRESS,
@@ -28,11 +28,12 @@ import {
   NUM_TRIALS,
   CONTROL_NUM_TRIALS,
   SHOW_CONTROL_TRIALS,
-  STIMULUS_FONT_SIZE
+  STIMULUS_FONT_SIZE,
+  IGNORE_CASE,
 } from './utils';
 
 // assets
-import intro_image from '../assets/intro.png';
+import intro_video from '../assets/intro-video.mp4';
 
 // ---------Initialize the jsPsych object and the timeline---------
 const config = await initConfig();
@@ -133,8 +134,13 @@ const randomDraw = (lst) => {
 
 // calculates whether the last trial was correct and records the accuracy in data object
 const record_acc = (data) => {
-  const target_lower = data.target.toLowerCase();
-  const stim_lower = curr_stim.toLowerCase();
+  let stim_lower = curr_stim; let
+    target_lower = data.target;
+  if (IGNORE_CASE) {
+    stim_lower = curr_stim.toLowerCase();
+    target_lower = data.target.toLowerCase();
+  }
+
   const key = data.response;
   let correct = false;
   if (stim_lower === target_lower && jsPsych.pluginAPI.compareKeys(key, CORRECT_KEY_PRESS)) {
@@ -182,10 +188,24 @@ const update_target = () => {
   }
 };
 
+function drawStim(stim) {
+  return `<div class = "centerbox"><div class = center-text><p style="font-size: ${STIMULUS_FONT_SIZE}px">${stim}</p></div></div>`;
+}
+
 const getStim = () => {
   const trial_type = target_trials.shift();
-  const targets = letters.filter((x) => x.toLowerCase() === target.toLowerCase());
-  const non_targets = letters.filter((x) => x.toLowerCase() !== target.toLowerCase());
+  const targets = letters.filter((x) => {
+    if (IGNORE_CASE) {
+      return x.toLowerCase() === target.toLowerCase();
+    }
+    return x === target;
+  });
+  const non_targets = letters.filter((x) => {
+    if (IGNORE_CASE) {
+      return x.toLowerCase() !== target.toLowerCase();
+    }
+    return x !== target;
+  });
   if (trial_type === 'target') {
     curr_stim = randomDraw(targets);
   } else {
@@ -227,14 +247,14 @@ const feedback_instruct_block = {
 const instructions_block = {
   type: jsPsychHtmlKeyboardResponse,
   stimulus: (() => {
-    let html = `<div class = "centerbox"><p class = "block-text">In this experiment you will see a sequence of letters presented one at a time. Your job is to respond by pressing the <strong>${CORRECT_KEY_TEXT}</strong> when the letter matches the same letter that occured some number of trials before (the number of trials is called the "delay"), otherwise you should press the <strong>${WRONG_KEY_TEXT}</strong>. The letters will be both lower and upper case. You should ignore the case (so "t" matches "T").</p><p class = block-text>The specific delay you should pay attention to will differ between blocks of trials, and you will be told the delay before starting a block.</p><p class = block-text>For instance, if the delay is 2, you are supposed to press the ${CORRECT_KEY_TEXT} when the current letter matches the letter that occurred 2 trials ago. If you saw the sequence: g...G...v...T...b...t...b, you would press the ${CORRECT_KEY_TEXT} on the last "t" and the last "b" and the ${WRONG_KEY_TEXT} for every other letter.</p>`;
-    
+    let html = `<div class = "centerbox"><p class = "block-text">In this experiment you will see a sequence of letters presented one at a time. Your job is to respond by pressing the <strong>${CORRECT_KEY_TEXT}</strong> when the letter matches the same letter that occured some number of trials before (the number of trials is called the "delay"), otherwise you should press the <strong>${WRONG_KEY_TEXT}</strong>. The letters will be both lower and upper case. ${IGNORE_CASE ? 'You should ignore the case (so "t" matches "T"), the letters are case-insensitive' : 'You should care about the case (so "t" only matches "t" and not "T"), the letters are case-sensitive'}.</p><p class = block-text>The specific delay you should pay attention to will differ between blocks of trials, and you will be told the delay before starting a block.</p><p class = block-text>For instance, if the delay is 2, you are supposed to press the ${CORRECT_KEY_TEXT} when the current letter matches the letter that occurred 2 trials ago. If you saw the sequence: g...G...v...T...b...t...b, you would press the ${CORRECT_KEY_TEXT} on the last "t" and the last "b" and the ${WRONG_KEY_TEXT} for every other letter.</p>`;
+
     if (SHOW_CONTROL_TRIALS) {
-      html += `<p class = block-text>On one block of trials there will be no delay. On this block you will be instructed to press the ${CORRECT_KEY_TEXT} to the presentation of a specific letter on that trial. For instance, the specific letter may be "t", in which case you would press the ${CORRECT_KEY_TEXT} to "t" or "T".</p>`;
+      html += `<p class = block-text>On one block of trials there will be no delay. On this block you will be instructed to press the ${CORRECT_KEY_TEXT} to the presentation of a specific letter on that trial. For instance, the specific letter may be "t", in which case you would press the ${CORRECT_KEY_TEXT} to "t"${IGNORE_CASE ? 'or "T"' : ''}.</p>`;
     }
-    
+
     html += `<p class = block-text>Press <strong>enter</strong> to continue.</p></div>`;
-    
+
     return html;
   })(),
   data: {
@@ -371,10 +391,6 @@ const feedback_trial = {
   },
 };
 
-function drawStim(stim) {
-  return `<div class = "centerbox"><div class = center-text><p style="font-size: ${STIMULUS_FONT_SIZE}px">${stim}</p></div></div>`
-}
-
 // Setup 1-back practice
 const practice_trials = [];
 for (let i = 0; i < (NUM_TRIALS + 1); i++) {
@@ -397,7 +413,11 @@ for (let i = 0; i < (NUM_TRIALS + 1); i++) {
     choices: [CORRECT_KEY_PRESS, WRONG_KEY_PRESS],
     on_finish: (data) => {
       // Score the response as correct or incorrect.
-      const matching_response = data.stim.toLowerCase() === data.target.toLowerCase();
+      let matching_response = data.stim === data.target;
+      if (IGNORE_CASE === true) {
+        matching_response = data.stim.toLowerCase() === data.target.toLowerCase();
+      }
+
       if (matching_response) {
         data.correct = jsPsych.pluginAPI.compareKeys(data.response, CORRECT_KEY_PRESS);
       } else {
@@ -427,7 +447,11 @@ for (let i = 0; i < CONTROL_NUM_TRIALS; i++) {
       record_acc(data);
       // Score the response as correct or incorrect.
       const stim = stims.slice(-1)[0];
-      const matching_response = stim.toLowerCase() === 't';
+      let matching_response = stim === 't';
+      if (IGNORE_CASE) {
+        matching_response = stim.toLowerCase() === 't';
+      }
+
       if (matching_response) {
         data.correct = jsPsych.pluginAPI.compareKeys(data.response, CORRECT_KEY_PRESS);
       } else {
@@ -451,14 +475,9 @@ const adaptive_test_node = {
 };
 
 // trials to add gamification
-const preload_image = {
+const preload_intro_video = {
   type: jsPsychPreload,
-  image: intro_image
-};
-
-const intro_node = {
-  type: jsPsychImageKeyboardResponse,
-  stimulus: intro_image
+  video: intro_video,
 };
 
 const exit_fullscreen = {
@@ -467,15 +486,24 @@ const exit_fullscreen = {
   delay_after: 0,
 };
 
+const intro_video_node = {
+  type: videoKeyboardResponse,
+  stimulus: [intro_video],
+  trial_ends_after_video: true,
+  response_allowed_while_playing: true,
+  trial_duration: null,
+  choices: 'NO_KEYS ',
+};
 
 // set up the experiment
 let adaptive_n_back_experiment = [];
 
 // preload assets
 adaptive_n_back_experiment.push(preloadAudio);
-adaptive_n_back_experiment.push(preload_image);
+adaptive_n_back_experiment.push(preload_intro_video);
 
-adaptive_n_back_experiment.push(intro_node);
+adaptive_n_back_experiment.push(intro_video_node);
+
 adaptive_n_back_experiment.push(instruction_node);
 adaptive_n_back_experiment.push(start_practice_block);
 adaptive_n_back_experiment = adaptive_n_back_experiment.concat(practice_trials);
