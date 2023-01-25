@@ -2,15 +2,16 @@
 import jsPsychFullScreen from '@jspsych/plugin-fullscreen';
 import jsPsychPreload from '@jspsych/plugin-preload';
 import jsPsychHtmlKeyboardResponse from '@jspsych/plugin-html-keyboard-response';
+import videoKeyboardResponse from '@jspsych/plugin-video-keyboard-response';
 import jsPsychCallFunction from '@jspsych/plugin-call-function';
 import jsPsychSurveyText from '@jspsych/plugin-survey-text';
 import jsPsychImageKeyboardResponse from "@jspsych/plugin-image-keyboard-response";
 import jsPsychAudioKeyboardResponse from "@jspsych/plugin-audio-keyboard-response";
 import {
-  CORRECT_KEY_PRESS,
-  CORRECT_KEY_TEXT,
-  WRONG_KEY_PRESS,
-  WRONG_KEY_TEXT,
+  // CORRECT_KEY_PRESS,
+  // CORRECT_KEY_TEXT,
+  // WRONG_KEY_PRESS,
+  // WRONG_KEY_TEXT,
   audioContent,
   preloadAudio,
 } from 'roar-utils';
@@ -20,6 +21,7 @@ import 'regenerator-runtime/runtime';
 
 // CSS imports
 import './css/roar.css';
+import './css/custom.css';
 
 // Local modules
 import { initConfig, initRoarJsPsych, initRoarTimeline } from './config';
@@ -28,11 +30,48 @@ import {
   NUM_TRIALS,
   CONTROL_NUM_TRIALS,
   SHOW_CONTROL_TRIALS,
-  STIMULUS_FONT_SIZE
+  STIMULUS_FONT_SIZE,
+  VIDEO_HEIGHT,
+  VIDEO_WIDTH,
 } from './utils';
 
 // assets
-import intro_image from '../assets/intro.png';
+import intro_video_1 from '../assets/intro-video-updated.mp4';
+import intro_video_2 from '../assets/intro-pt-2-updated.mp4';
+import intro_video_3 from '../assets/intro-pt-3-updated.mp4';
+import game_instructions_1 from '../assets/game-instructions-1.mp4';
+import game_instructions_2 from '../assets/game-instructions-2.mp4';
+import game_instructions_3 from '../assets/game-instructions-3.mp4';
+import pos_instuctions_feedback from '../assets/instruction-fb-pos.mp4';
+import neg_instuctions_feedback from '../assets/instructions-fb-neg.mp4';
+import two_back_instructions from '../assets/two-back-instructions.mp4';
+import move_on_2_back_practice from '../assets/move-on-2-back-instructions.mp4';
+import redo_2_back_practice from '../assets/redo-2-back-practice.mp4';
+import three_back_instructions from '../assets/three-back-instructions.mp4';
+import fix_robot_1 from '../assets/fix-robot-1.mp4';
+import fix_robot_2 from '../assets/fix-robot-2.mp4';
+import fix_robot_3 from '../assets/fix-robot-3.mp4';
+import fix_robot_4 from '../assets/fix-robot-4.mp4';
+import fix_robot_5 from '../assets/fix-robot-5.mp4';
+import fix_robot_6 from '../assets/fix-robot-6.mp4';
+import fix_robot_n from '../assets/fix-robot-n.mp4';
+import right_arrow_image from '../assets/right-trial-screen-arrow.png';
+import left_arrow_image from '../assets/left-trial-screen-arrow.png';
+import trial_screen_robot from '../assets/robot-no-bkgrnd.png';
+// import arms_feet_swapped_image from '../assets/arms-feet-swapped.png';
+// import arms_legs_swapped_image from '../assets/arms-legs-swapped.png';
+// import dr_woofus_intro_image from '../assets/dr-woofus-intro.png';
+// import final_robot_smiling_image from '../assets/final-smiling.png';
+// import final_robot_image from '../assets/final.png';
+// import instructions_image from '../assets/instructions.png';
+// import intro_image from '../assets/intro.png';
+// import last_page_instructions_image from '../assets/last-page-instructions.png';
+// import swapped_feet_image from '../assets/swapped-feet.png';
+
+const CORRECT_KEY_PRESS = 'ArrowRight';
+const CORRECT_KEY_TEXT = 'right arrow key';
+const WRONG_KEY_PRESS = 'ArrowLeft';
+const WRONG_KEY_TEXT = 'left arrow key';
 
 // ---------Initialize the jsPsych object and the timeline---------
 const config = await initConfig();
@@ -49,7 +88,7 @@ let credit_let = true; // default to true
 const letters = 'bBdDgGtTvV'.split("");
 const control_before = Math.round(Math.random()); // 0 control comes before test, 1, after
 let block_acc = 0; // record block accuracy to determine next blocks delay
-let delay = 2; // starting delay
+let delay = 1; // starting delay
 let trials_left = 0; // counter used by adaptive_test_node
 let target_trials = []; // array defining whether each trial in a block is a target trial
 let current_trial = 0;
@@ -135,6 +174,8 @@ const randomDraw = (lst) => {
 const record_acc = (data) => {
   const target_lower = data.target.toLowerCase();
   const stim_lower = curr_stim.toLowerCase();
+  console.log("Target:", target_lower, "Stimulus:", stim_lower);
+  console.log();
   const key = data.response;
   let correct = false;
   if (stim_lower === target_lower && jsPsych.pluginAPI.compareKeys(key, CORRECT_KEY_PRESS)) {
@@ -228,13 +269,13 @@ const instructions_block = {
   type: jsPsychHtmlKeyboardResponse,
   stimulus: (() => {
     let html = `<div class = "centerbox"><p class = "block-text">In this experiment you will see a sequence of letters presented one at a time. Your job is to respond by pressing the <strong>${CORRECT_KEY_TEXT}</strong> when the letter matches the same letter that occured some number of trials before (the number of trials is called the "delay"), otherwise you should press the <strong>${WRONG_KEY_TEXT}</strong>. The letters will be both lower and upper case. You should ignore the case (so "t" matches "T").</p><p class = block-text>The specific delay you should pay attention to will differ between blocks of trials, and you will be told the delay before starting a block.</p><p class = block-text>For instance, if the delay is 2, you are supposed to press the ${CORRECT_KEY_TEXT} when the current letter matches the letter that occurred 2 trials ago. If you saw the sequence: g...G...v...T...b...t...b, you would press the ${CORRECT_KEY_TEXT} on the last "t" and the last "b" and the ${WRONG_KEY_TEXT} for every other letter.</p>`;
-    
+
     if (SHOW_CONTROL_TRIALS) {
       html += `<p class = block-text>On one block of trials there will be no delay. On this block you will be instructed to press the ${CORRECT_KEY_TEXT} to the presentation of a specific letter on that trial. For instance, the specific letter may be "t", in which case you would press the ${CORRECT_KEY_TEXT} to "t" or "T".</p>`;
     }
-    
+
     html += `<p class = block-text>Press <strong>enter</strong> to continue.</p></div>`;
-    
+
     return html;
   })(),
   data: {
@@ -371,8 +412,19 @@ const feedback_trial = {
   },
 };
 
+// figure out how to add some styling to the arrows - make the background color change based on the click // 
 function drawStim(stim) {
-  return `<div class = "centerbox"><div class = center-text><p style="font-size: ${STIMULUS_FONT_SIZE}px">${stim}</p></div></div>`
+  return `<div class = "centerbox"><div class="center-text stimulus-circle">
+    <p style="font-size: ${STIMULUS_FONT_SIZE}px" class="stimulus-stext">${stim}</p>
+    <div class="arrow-div">
+    <div class="right-arrow-div">
+      <img src="${right_arrow_image}" class="right-arrow"></img>
+    </div>
+    <div class="left-arrow-div">
+    <img src="${left_arrow_image}" class="left-arrow"></img>
+  </div>
+  </div>
+  </div>`;
 }
 
 // Setup 1-back practice
@@ -451,15 +503,161 @@ const adaptive_test_node = {
 };
 
 // trials to add gamification
-const preload_image = {
+ const images = [
+  // arms_legs_swapped_image,
+  // arms_feet_swapped_image,
+  // dr_woofus_intro_image,
+  // final_robot_smiling_image,
+  // final_robot_image,
+  // instructions_image,
+  // intro_image,
+  // last_page_instructions_image,
+  // swapped_feet_image,
+  left_arrow_image,
+  right_arrow_image,
+];
+
+const videos = [
+  intro_video_1,
+  intro_video_2,
+  intro_video_3,
+  game_instructions_1,
+  game_instructions_2,
+  game_instructions_3,
+  pos_instuctions_feedback,
+  neg_instuctions_feedback,
+  two_back_instructions,
+  move_on_2_back_practice,
+  redo_2_back_practice,
+  three_back_instructions,
+  fix_robot_1,
+  fix_robot_2,
+  fix_robot_3,
+  fix_robot_4,
+  fix_robot_5,
+  fix_robot_6,
+  fix_robot_n,
+];
+
+const preload_videos = {
   type: jsPsychPreload,
-  image: intro_image
+  video: videos,
 };
 
-const intro_node = {
-  type: jsPsychImageKeyboardResponse,
-  stimulus: intro_image
+const preload_images = {
+  type: jsPsychPreload,
+  image: images,
 };
+
+const video_parameters = {
+  type: videoKeyboardResponse,
+  trial_ends_after_video: false,
+  response_allowed_while_playing: true,
+  trial_duration: null,
+  choices: "ALL_KEYS",
+  width: VIDEO_WIDTH,
+  height: VIDEO_HEIGHT,
+};
+
+const intro_video_node_1 = {
+  stimulus: [intro_video_1],
+  ...video_parameters,
+};
+
+const intro_video_node_2 = {
+  stimulus: [intro_video_2],
+  ...video_parameters,
+};
+
+const intro_video_node_3 = {
+  stimulus: [intro_video_3],
+  ...video_parameters,
+};
+
+// trying to figure out how to make it so that this will push only after the neg_instructions_fb
+// is pushed (and makes sure that they get it right )
+const neg_instuctions_feedback_parameters = {
+  type: videoKeyboardResponse,
+  trial_ends_after_video: false,
+  response_allowed_while_playing: true,
+  trial_duration: null,
+  choices: [CORRECT_KEY_PRESS, WRONG_KEY_PRESS],
+  width: VIDEO_WIDTH,
+  height: VIDEO_HEIGHT,
+  stimulus: () => {
+    const last_trial_correct = jsPsych.data.get().last(1).values()[0].correct;
+    if (last_trial_correct) {
+      // the parameter value has to be returned from the function
+      return [""];
+    }
+    // the parameter value has to be returned from the function
+    return [neg_instuctions_feedback];
+  },
+};
+
+const game_instructions_feedback_trial = {
+  type: videoKeyboardResponse,
+  trial_ends_after_video: true,
+  response_allowed_while_playing: true,
+  trial_duration: null,
+  choices: "ALL_KEYS",
+  width: VIDEO_WIDTH,
+  height: VIDEO_HEIGHT,
+  stimulus: () => {
+    const last_trial_correct = jsPsych.data.get().last(1).values()[0].correct;
+    if (last_trial_correct) {
+      return [pos_instuctions_feedback];
+    }
+    return [neg_instuctions_feedback];
+      // ...neg_instuctions_feedback_parameters];
+  },
+};
+
+const game_instructions = {
+  stimulus: [game_instructions_1],
+  type: videoKeyboardResponse,
+  trial_ends_after_video: false,
+  response_allowed_while_playing: true,
+  trial_duration: null,
+  width: 1440,
+  height: 1800,
+  data: {
+    task: "practice_response",
+    correct_response: "CORRECT_KEY_PRESS",
+  },
+  choices: [CORRECT_KEY_PRESS, WRONG_KEY_PRESS],
+  on_finish: (data) => {
+    // Score the response as correct or incorrect.
+    // (right_arrow) {
+    //   data.correct = jsPsych.pluginAPI.compareKeys(data.response, CORRECT_KEY_PRESS);
+    // } else {
+    data.correct = jsPsych.pluginAPI.compareKeys(data.response, CORRECT_KEY_PRESS);
+  },
+};
+
+const game_instructions_cont1 = {
+  stimulus: [game_instructions_2],
+  type: videoKeyboardResponse,
+  ...video_parameters,
+};
+
+const game_instructions_prac_finish = {
+  stimulus: [game_instructions_3],
+  type: videoKeyboardResponse,
+  ...video_parameters,
+};
+
+// const instructions = [
+//   {
+//     // instructions for 1-back
+//   },
+//   {
+//     two_back_instructions,
+//   },
+//   {
+//     three_back_instructions,
+//   },
+// ];
 
 const exit_fullscreen = {
   type: jsPsychFullScreen,
@@ -467,37 +665,88 @@ const exit_fullscreen = {
   delay_after: 0,
 };
 
-
 // set up the experiment
 let adaptive_n_back_experiment = [];
 
 // preload assets
 adaptive_n_back_experiment.push(preloadAudio);
-adaptive_n_back_experiment.push(preload_image);
+adaptive_n_back_experiment.push(preload_videos);
+adaptive_n_back_experiment.push(preload_images);
+// intro videos
+// adaptive_n_back_experiment.push(intro_video_node_1);
+// adaptive_n_back_experiment.push(intro_video_node_2);
+// adaptive_n_back_experiment.push(intro_video_node_3);
+// 1-back instructions
+adaptive_n_back_experiment.push(game_instructions, game_instructions_feedback_trial);
+adaptive_n_back_experiment.push(game_instructions_cont1);
 
-adaptive_n_back_experiment.push(intro_node);
-adaptive_n_back_experiment.push(instruction_node);
+// adaptive_n_back_experiment.push(instruction_node);
 adaptive_n_back_experiment.push(start_practice_block);
 adaptive_n_back_experiment = adaptive_n_back_experiment.concat(practice_trials);
 adaptive_n_back_experiment.push(update_progress_bar_block);
+adaptive_n_back_experiment.push(game_instructions_prac_finish);
 
 if (SHOW_CONTROL_TRIALS && control_before === 0) {
   adaptive_n_back_experiment.push(start_control_block);
   adaptive_n_back_experiment = adaptive_n_back_experiment.concat(control_trials);
   adaptive_n_back_experiment.push(update_progress_bar_block);
+  // add video for game break 
 }
 
 for (let b = 0; b < NUM_BLOCKS; b++) {
   adaptive_n_back_experiment.push(start_adaptive_block);
   adaptive_n_back_experiment.push(adaptive_test_node);
   adaptive_n_back_experiment.push(update_delay_block);
+  // add generic video for game break 
   adaptive_n_back_experiment.push(update_progress_bar_block);
+
+  /*
+  if (delay === 2 && !show_instructions[2]) {
+    // push 2-back instructions
+    show_instructions[2] = true;
+  } else if (delay === 3 && !show_instructions[3]) {
+    // push 3-back instructions
+    show_instructions[3] = true;
+  }
+  const show_instructions = [
+    -1, // dummy value for 0-back
+    true,   // 1 if we have shown instructions for 1-back, 0 otherwise
+    false,  // 1 if we have shown instructions for 2-back, 0 otherwise
+    false,  // 1 if we have shown instructions for 3-back, 0 otherwise
+    false,  // . . .
+    false,
+    false,
+  ];
+
+  const number_of_n_back_instructions = 5;
+
+  function get_instructions(delay) {
+    if (delay === 1) {
+      // return instructions for 1-back
+    } else if (delay === 2) {
+      // return instructions for 2-back
+    } else ...
+  }
+
+  if (delay <= number_of_n_back_instructions && !show_instructions[delay]) {
+    // a function that returns instructions given a delay
+    const instructions = get_instructions(delay);
+    
+    // push these instructions
+    adaptive_n_back_experiment.push(...instructions);
+
+    // make sure we don't show these instructions
+    show_instructions[delay] = true;
+  }
+  */
 }
 
 if (SHOW_CONTROL_TRIALS && control_before === 1) {
   adaptive_n_back_experiment.push(start_control_block);
   adaptive_n_back_experiment = adaptive_n_back_experiment.concat(control_trials);
   adaptive_n_back_experiment.push(update_progress_bar_block);
+  // add video for game break 
+
 }
 
 // set up control
