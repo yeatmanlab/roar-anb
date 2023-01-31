@@ -134,8 +134,8 @@ const randomDraw = (lst) => {
 
 // calculates whether the last trial was correct and records the accuracy in data object
 const record_acc = (data) => {
-  let stim_lower = curr_stim; let
-    target_lower = data.target;
+  let stim_lower = curr_stim;
+  let target_lower = data.target;
   if (IGNORE_CASE) {
     stim_lower = curr_stim.toLowerCase();
     target_lower = data.target.toLowerCase();
@@ -360,12 +360,12 @@ const start_adaptive_block = {
 const adaptive_block = {
   type: jsPsychHtmlKeyboardResponse,
   stimulus: getStim,
-  data: {
+  data: () => ({
     ...blockConfig.adaptive,
     load: delay,
     target: target,
     block_num: current_block,
-  },
+  }),
   choices: [CORRECT_KEY_PRESS, WRONG_KEY_PRESS],
   on_finish: (data) => {
     record_acc(data);
