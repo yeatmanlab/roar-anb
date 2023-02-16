@@ -7,3 +7,7 @@ export const STIMULUS_FONT_SIZE = 80;
 export const VIDEO_WIDTH = 1440;
 export const VIDEO_HEIGHT = 1800;
 export const IGNORE_CASE = true;
+export const CORRECT_KEY_PRESS = 'ArrowRight';
+export const CORRECT_KEY_TEXT = 'right arrow key';
+export const WRONG_KEY_PRESS = 'ArrowLeft';
+export const WRONG_KEY_TEXT = 'left arrow key';
