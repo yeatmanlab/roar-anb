@@ -29,7 +29,7 @@ body {
     max-width: 125px;
     /* width: 100px;
     height: 250px; */
-    background-color: rgba(169,169,169,0.7);    
+    /* background-color: rgba(169,169,169,0.7);     */
     float: right;
     /* bottom:0; Aligns at the bottom */
     /* right:399px; */
@@ -38,6 +38,10 @@ body {
     /* left: 50%; */
     /* -ms-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%); */
+}
+
+#arrow-bg-color {
+    background-color: rgba(169,169,169,0.7);    
 }
 
 .left-arrow {
@@ -53,7 +57,7 @@ body {
     max-width: 125px;
     /* width: 100px;
     height: 250px; */
-    background-color: rgba(169,169,169,0.7);
+    /* background-color: rgba(169,169,169,0.7); */
     /* margin:auto;  */
     /* position:absolute;
     bottom:0; /* Aligns at the bottom */
