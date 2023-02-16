@@ -27,7 +27,8 @@ import './css/custom.css';
 import { initConfig, initRoarJsPsych, initRoarTimeline } from './config';
 import {
   NUM_BLOCKS,
-  NUM_TRIALS,
+  ADAPTIVE_NUM_TRIALS,
+  PRACTICE_NUM_TRIALS,
   CONTROL_NUM_TRIALS,
   SHOW_CONTROL_TRIALS,
   STIMULUS_FONT_SIZE,
@@ -36,17 +37,15 @@ import {
 } from './utils';
 
 // assets
-import intro_video_1 from '../assets/intro-video-updated.mp4';
+import intro_video_1 from '../assets/intro-vid-updated.mp4';
 import intro_video_2 from '../assets/intro-pt-2-updated.mp4';
 import intro_video_3 from '../assets/intro-pt-3-updated.mp4';
 import game_instructions_1 from '../assets/game-instructions-1.mp4';
 import game_instructions_2 from '../assets/game-instructions-2.mp4';
-import game_instructions_3 from '../assets/game-instructions-3.mp4';
+import game_instructions_3 from '../assets/game-instructions-3-new.mp4';
 import pos_instuctions_feedback from '../assets/instruction-fb-pos.mp4';
-import neg_instuctions_feedback from '../assets/instructions-fb-neg.mp4';
+import neg_instuctions_feedback from '../assets/new-wrong-arrow.mp4';
 import two_back_instructions from '../assets/two-back-instructions.mp4';
-import move_on_2_back_practice from '../assets/move-on-2-back-instructions.mp4';
-import redo_2_back_practice from '../assets/redo-2-back-practice.mp4';
 import three_back_instructions from '../assets/three-back-instructions.mp4';
 import fix_robot_1 from '../assets/fix-robot-1.mp4';
 import fix_robot_2 from '../assets/fix-robot-2.mp4';
@@ -57,16 +56,11 @@ import fix_robot_6 from '../assets/fix-robot-6.mp4';
 import fix_robot_n from '../assets/fix-robot-n.mp4';
 import right_arrow_image from '../assets/right-trial-screen-arrow.png';
 import left_arrow_image from '../assets/left-trial-screen-arrow.png';
+import end_video from '../assets/end-video.mp4';
+import generic_game_break from '../assets/game-break.mp4';
 import trial_screen_robot from '../assets/robot-no-bkgrnd.png';
-// import arms_feet_swapped_image from '../assets/arms-feet-swapped.png';
-// import arms_legs_swapped_image from '../assets/arms-legs-swapped.png';
-// import dr_woofus_intro_image from '../assets/dr-woofus-intro.png';
 // import final_robot_smiling_image from '../assets/final-smiling.png';
 // import final_robot_image from '../assets/final.png';
-// import instructions_image from '../assets/instructions.png';
-// import intro_image from '../assets/intro.png';
-// import last_page_instructions_image from '../assets/last-page-instructions.png';
-// import swapped_feet_image from '../assets/swapped-feet.png';
 
 const CORRECT_KEY_PRESS = 'ArrowRight';
 const CORRECT_KEY_TEXT = 'right arrow key';
@@ -96,6 +90,7 @@ let current_block = 0;
 let block_trial = 0;
 let target = "";
 let curr_stim = '';
+let response = "";
 let stims = []; // hold stims per block
 const blockConfig = {
   adaptive: { trial_id: "stim", exp_stage: "adaptive" },
@@ -199,7 +194,7 @@ const record_acc = (data) => {
 };
 
 const update_delay = () => {
-  const mistakes = NUM_TRIALS - block_acc;
+  const mistakes = ADAPTIVE_NUM_TRIALS - block_acc;
   if (delay >= 2) {
     if (mistakes < 3) {
       delay += 1;
@@ -235,6 +230,8 @@ const getStim = () => {
   stims.push(curr_stim);
   return drawStim(curr_stim);
 };
+
+const getLatestStim = () => stims.slice(-1)[0];
 
 /* ************************************ */
 /* Set up jsPsych blocks */
@@ -284,9 +281,9 @@ const instructions_block = {
   choices: ['Enter'],
 };
 
-const instruction_node = {
-  timeline: [feedback_instruct_block, instructions_block],
-};
+// const instruction_node = {
+//   timeline: [feedback_instruct_block, instructions_block],
+// };
 
 const end_block = {
   type: jsPsychHtmlKeyboardResponse,
@@ -359,14 +356,14 @@ const start_adaptive_block = {
   on_finish: () => {
     block_trial = 0;
     stims = [];
-    trials_left = NUM_TRIALS + delay;
+    trials_left = ADAPTIVE_NUM_TRIALS + delay;
     target_trials = [];
     for (let i = 0; i < delay; i++) {
       target_trials.push('0');
     }
     let trials_to_add = [];
     for (let j = 0; j < (trials_left - delay); j++) {
-      if (j < (Math.round(NUM_TRIALS / 3))) {
+      if (j < (Math.round(ADAPTIVE_NUM_TRIALS / 3))) {
         trials_to_add.push('target');
       } else {
         trials_to_add.push('0');
@@ -412,15 +409,14 @@ const feedback_trial = {
   },
 };
 
-// figure out how to add some styling to the arrows - make the background color change based on the click // 
-function drawStim(stim) {
+function drawStim(stim, direction) {
   return `<div class = "centerbox"><div class="center-text stimulus-circle">
     <p style="font-size: ${STIMULUS_FONT_SIZE}px" class="stimulus-stext">${stim}</p>
     <div class="arrow-div">
-    <div class="right-arrow-div">
+    <div class="right-arrow-div" id="${(jsPsych.pluginAPI.compareKeys(direction, "ArrowRight")) ? "arrow-bg-color" : ''}">
       <img src="${right_arrow_image}" class="right-arrow"></img>
     </div>
-    <div class="left-arrow-div">
+    <div class="left-arrow-div" id="${(jsPsych.pluginAPI.compareKeys(direction, "ArrowLeft")) ? "arrow-bg-color" : ''}">
     <img src="${left_arrow_image}" class="left-arrow"></img>
   </div>
   </div>
@@ -429,7 +425,7 @@ function drawStim(stim) {
 
 // Setup 1-back practice
 const practice_trials = [];
-for (let i = 0; i < (NUM_TRIALS + 1); i++) {
+for (let i = 0; i < PRACTICE_NUM_TRIALS; i++) {
   const stim = randomDraw(letters);
   stims.push(stim);
   if (i >= 1) {
@@ -438,7 +434,7 @@ for (let i = 0; i < (NUM_TRIALS + 1); i++) {
   const practice_block = {
     type: jsPsychHtmlKeyboardResponse,
     is_html: true,
-    stimulus: drawStim(stim),
+    stimulus: drawStim(stim, "normal"),
     data: {
       trial_id: "stim",
       exp_stage: "practice",
@@ -455,10 +451,27 @@ for (let i = 0; i < (NUM_TRIALS + 1); i++) {
       } else {
         data.correct = jsPsych.pluginAPI.compareKeys(data.response, WRONG_KEY_PRESS);
       }
+      response = data.response;
+      console.log("response-1", response);
     },
   };
 
-  practice_trials.push(practice_block, feedback_trial);
+  const practice_block_visual_feedback = {
+    type: jsPsychHtmlKeyboardResponse,
+    is_html: true,
+    stimulus: drawStim(stim, response),
+    trial_duration: 300,
+    data: {
+      trial_id: "stim",
+      exp_stage: "practice",
+      stim: stim,
+      target: target,
+      save_trial: true,
+    },
+    choices: [],
+  };
+
+  practice_trials.push(practice_block, practice_block_visual_feedback, feedback_trial);
 }
 
 // Define control (0-back) block
@@ -491,8 +504,27 @@ for (let i = 0; i < CONTROL_NUM_TRIALS; i++) {
   control_trials.push(control_block, feedback_trial);
 }
 
+
+const adaptive_block_visual_feedback = {
+  type: jsPsychHtmlKeyboardResponse,
+  is_html: true,
+  stimulus: () => {
+    const response = jsPsych.data.get().last(1).values()[0].response;
+    return drawStim(getLatestStim(), response);
+  },
+  trial_duration: 300,
+  data: {
+    trial_id: "stim",
+    exp_stage: "practice",
+    stim: getLatestStim,
+    target: target,
+    save_trial: true,
+  },
+  choices: [],
+};
+
 const adaptive_test_node = {
-  timeline: [update_target_block, adaptive_block, feedback_trial],
+  timeline: [update_target_block, adaptive_block, adaptive_block_visual_feedback, feedback_trial],
   loop_function: () => {
     trials_left -= 1;
     if (trials_left === 0) {
@@ -504,15 +536,8 @@ const adaptive_test_node = {
 
 // trials to add gamification
  const images = [
-  // arms_legs_swapped_image,
-  // arms_feet_swapped_image,
-  // dr_woofus_intro_image,
   // final_robot_smiling_image,
   // final_robot_image,
-  // instructions_image,
-  // intro_image,
-  // last_page_instructions_image,
-  // swapped_feet_image,
   left_arrow_image,
   right_arrow_image,
 ];
@@ -527,8 +552,6 @@ const videos = [
   pos_instuctions_feedback,
   neg_instuctions_feedback,
   two_back_instructions,
-  move_on_2_back_practice,
-  redo_2_back_practice,
   three_back_instructions,
   fix_robot_1,
   fix_robot_2,
@@ -537,6 +560,7 @@ const videos = [
   fix_robot_5,
   fix_robot_6,
   fix_robot_n,
+  generic_game_break,
 ];
 
 const preload_videos = {
@@ -647,17 +671,28 @@ const game_instructions_prac_finish = {
   ...video_parameters,
 };
 
-// const instructions = [
-//   {
-//     // instructions for 1-back
-//   },
-//   {
-//     two_back_instructions,
-//   },
-//   {
-//     three_back_instructions,
-//   },
-// ];
+const game_break = {
+  stimulus: [generic_game_break],
+  type: videoKeyboardResponse,
+  ...video_parameters,
+};
+
+const instructions = [
+  {}, // add dummy items for intuitive indexing 
+  {
+    
+  }, // add dummy items for intuitive indexing 
+  {
+    // two-back instructions
+    video: two_back_instructions,
+    shown: false,
+  },
+  {
+    // three-back instructions
+    video: three_back_instructions,
+    shown: false,
+  },
+];
 
 const exit_fullscreen = {
   type: jsPsychFullScreen,
@@ -677,76 +712,49 @@ adaptive_n_back_experiment.push(preload_images);
 // adaptive_n_back_experiment.push(intro_video_node_2);
 // adaptive_n_back_experiment.push(intro_video_node_3);
 // 1-back instructions
-adaptive_n_back_experiment.push(game_instructions, game_instructions_feedback_trial);
-adaptive_n_back_experiment.push(game_instructions_cont1);
+// adaptive_n_back_experiment.push(game_instructions, game_instructions_feedback_trial);
+// adaptive_n_back_experiment.push(game_instructions_cont1);
 
 // adaptive_n_back_experiment.push(instruction_node);
-adaptive_n_back_experiment.push(start_practice_block);
-adaptive_n_back_experiment = adaptive_n_back_experiment.concat(practice_trials);
-adaptive_n_back_experiment.push(update_progress_bar_block);
-adaptive_n_back_experiment.push(game_instructions_prac_finish);
+// adaptive_n_back_experiment.push(start_practice_block);
+// adaptive_n_back_experiment = adaptive_n_back_experiment.concat(practice_trials);
+// adaptive_n_back_experiment.push(update_progress_bar_block);
+// adaptive_n_back_experiment.push(game_instructions_prac_finish);
 
-if (SHOW_CONTROL_TRIALS && control_before === 0) {
-  adaptive_n_back_experiment.push(start_control_block);
-  adaptive_n_back_experiment = adaptive_n_back_experiment.concat(control_trials);
-  adaptive_n_back_experiment.push(update_progress_bar_block);
-  // add video for game break 
-}
+// if (SHOW_CONTROL_TRIALS && control_before === 0) {
+//   adaptive_n_back_experiment.push(start_control_block);
+//   adaptive_n_back_experiment = adaptive_n_back_experiment.concat(control_trials);
+//   adaptive_n_back_experiment.push(update_progress_bar_block);
+//   adaptive_n_back_experiment.push(game_break);
+// }
 
 for (let b = 0; b < NUM_BLOCKS; b++) {
-  adaptive_n_back_experiment.push(start_adaptive_block);
-  adaptive_n_back_experiment.push(adaptive_test_node);
+  // adaptive_n_back_experiment.push(start_adaptive_block);
+  // adaptive_n_back_experiment.push(adaptive_test_node);
   adaptive_n_back_experiment.push(update_delay_block);
-  // add generic video for game break 
+
+  if (b < NUM_BLOCKS - 1) { adaptive_n_back_experiment.push(game_break); }
+
   adaptive_n_back_experiment.push(update_progress_bar_block);
 
-  /*
-  if (delay === 2 && !show_instructions[2]) {
-    // push 2-back instructions
-    show_instructions[2] = true;
-  } else if (delay === 3 && !show_instructions[3]) {
-    // push 3-back instructions
-    show_instructions[3] = true;
+  if (instructions[delay].shown !== undefined && !instructions[delay].shown) {
+    const delay_back_video = {
+      stimulus: [instructions[delay].video],
+      ...video_parameters,
+    };
+
+    adaptive_n_back_experiment.push(delay_back_video);
+    instructions[delay].shown = true;
   }
-  const show_instructions = [
-    -1, // dummy value for 0-back
-    true,   // 1 if we have shown instructions for 1-back, 0 otherwise
-    false,  // 1 if we have shown instructions for 2-back, 0 otherwise
-    false,  // 1 if we have shown instructions for 3-back, 0 otherwise
-    false,  // . . .
-    false,
-    false,
-  ];
-
-  const number_of_n_back_instructions = 5;
-
-  function get_instructions(delay) {
-    if (delay === 1) {
-      // return instructions for 1-back
-    } else if (delay === 2) {
-      // return instructions for 2-back
-    } else ...
-  }
-
-  if (delay <= number_of_n_back_instructions && !show_instructions[delay]) {
-    // a function that returns instructions given a delay
-    const instructions = get_instructions(delay);
-    
-    // push these instructions
-    adaptive_n_back_experiment.push(...instructions);
-
-    // make sure we don't show these instructions
-    show_instructions[delay] = true;
-  }
-  */
 }
 
 if (SHOW_CONTROL_TRIALS && control_before === 1) {
+  // we do not show game break for the last adaptive block, so we must show it before the control block 
+  adaptive_n_back_experiment.push(game_break);
   adaptive_n_back_experiment.push(start_control_block);
   adaptive_n_back_experiment = adaptive_n_back_experiment.concat(control_trials);
   adaptive_n_back_experiment.push(update_progress_bar_block);
-  // add video for game break 
-
+  // do not show game break since this is the final block 
 }
 
 // set up control
@@ -757,3 +765,4 @@ timeline.push(...adaptive_n_back_experiment);
 timeline.push(exit_fullscreen);
 
 jsPsych.run(timeline);
+ 
