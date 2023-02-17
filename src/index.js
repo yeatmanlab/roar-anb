@@ -56,9 +56,9 @@ import fix_robot_6 from '../assets/fix-robot-6.mp4';
 import fix_robot_n from '../assets/fix-robot-n.mp4';
 import right_arrow_image from '../assets/right-trial-screen-arrow.png';
 import left_arrow_image from '../assets/left-trial-screen-arrow.png';
-import end_video from '../assets/end-video.mp4'; // TODO: add this to the end of the experiment
+import end_video from '../assets/end-video.mp4';
 import generic_game_break from '../assets/game-break.mp4';
-import trial_screen_robot from '../assets/robot-no-bkgrnd.png'; // TODO: add this on the stim screen
+import trial_screen_robot from '../assets/robot-no-bkgrnd.png';
 
 // ---------Initialize the jsPsych object and the timeline---------
 const config = await initConfig();
@@ -146,11 +146,6 @@ function assessPerformance() {
   credit_let = (missed_percent < 0.4 && (avg_rt > 200) && responses_ok);
   jsPsych.data.addDataToLastTrial({ credit_let: credit_let });
 }
-
-const getInstructFeedback = () => {
-  const feedback_instruct_text = 'Welcome to the experiment. This task will take around 20 minutes. Press <strong>enter</strong> to begin.';
-  return `<div class = "centerbox"><p class = center-block-text>${feedback_instruct_text}</p></div>`;
-};
 
 const randomDraw = (lst) => {
   const index = Math.floor(Math.random() * (lst.length));
@@ -255,17 +250,6 @@ const post_task_block = {
   ],
   rows: [15, 15],
   columns: [60, 60],
-};
-
-const end_block = {
-  type: jsPsychHtmlKeyboardResponse,
-  stimulus: '<div class = "centerbox"><p class = "center-block-text">Thanks for completing this task!</p><p class = center-block-text>Press <strong>enter</strong> to begin.</p></div>',
-  choices: ['Enter'],
-  data: {
-    trial_id: "end",
-    exp_id: 'adaptive_n_back',
-  },
-  on_finish: assessPerformance,
 };
 
 const update_delay_block = {
@@ -383,8 +367,11 @@ function drawStim(stim, direction) {
     </div>
     <div class="left-arrow-div" id="${(jsPsych.pluginAPI.compareKeys(direction, "ArrowLeft")) ? "arrow-bg-color" : ''}">
     <img src="${left_arrow_image}" class="left-arrow"></img>
+    </div>
   </div>
-  </div>
+  <div class="robot-div">
+  <img src="${trial_screen_robot}" class="stimulus-robot"></img>
+</div>
   </div>`;
 }
 
@@ -399,7 +386,7 @@ for (let i = 0; i < PRACTICE_NUM_TRIALS; i++) {
   const practice_block = {
     type: jsPsychHtmlKeyboardResponse,
     is_html: true,
-    stimulus: drawStim(stim, "normal"), // TODO: either remove normal or put a value that we don't care about like an _
+    stimulus: drawStim(stim),
     data: {
       trial_id: "stim",
       exp_stage: "practice",
@@ -478,7 +465,6 @@ for (let i = 0; i < CONTROL_NUM_TRIALS; i++) {
   control_trials.push(control_block, feedback_trial);
 }
 
-
 const adaptive_block_visual_feedback = {
   type: jsPsychHtmlKeyboardResponse,
   is_html: true,
@@ -509,9 +495,7 @@ const adaptive_test_node = {
 };
 
 // trials to add gamification
- const images = [
-  // final_robot_smiling_image,
-  // final_robot_image,
+const images = [
   left_arrow_image,
   right_arrow_image,
 ];
@@ -607,7 +591,6 @@ const game_instructions_feedback_trial = {
       return [pos_instuctions_feedback];
     }
     return [neg_instuctions_feedback];
-      // ...neg_instuctions_feedback_parameters];
   },
 };
 
@@ -651,6 +634,12 @@ const game_break = {
   ...video_parameters,
 };
 
+const ending_video = {
+  stimulus: [end_video],
+  type: videoKeyboardResponse,
+  ...video_parameters,
+};
+
 const instructions = [
   {}, // add dummy items for intuitive indexing
   {
@@ -668,6 +657,16 @@ const instructions = [
   },
 ];
 
+const fix_robot_videos = [
+  {}, // dummy fix robot video
+  fix_robot_1,
+  fix_robot_2,
+  fix_robot_3,
+  fix_robot_4,
+  fix_robot_5,
+  fix_robot_6,
+];
+
 const exit_fullscreen = {
   type: jsPsychFullScreen,
   fullscreen_mode: false,
@@ -682,12 +681,12 @@ adaptive_n_back_experiment.push(preloadAudio);
 adaptive_n_back_experiment.push(preload_videos);
 adaptive_n_back_experiment.push(preload_images);
 // intro videos
-// adaptive_n_back_experiment.push(intro_video_node_1);
-// adaptive_n_back_experiment.push(intro_video_node_2);
-// adaptive_n_back_experiment.push(intro_video_node_3);
+adaptive_n_back_experiment.push(intro_video_node_1);
+adaptive_n_back_experiment.push(intro_video_node_2);
+adaptive_n_back_experiment.push(intro_video_node_3);
 // // 1-back instructions
-// adaptive_n_back_experiment.push(game_instructions, game_instructions_feedback_trial);
-// adaptive_n_back_experiment.push(game_instructions_cont1);
+adaptive_n_back_experiment.push(game_instructions, game_instructions_feedback_trial);
+adaptive_n_back_experiment.push(game_instructions_cont1);
 
 // practice block
 adaptive_n_back_experiment = adaptive_n_back_experiment.concat(practice_trials);
@@ -701,12 +700,19 @@ if (SHOW_CONTROL_TRIALS && control_before === 0) {
   adaptive_n_back_experiment.push(game_break);
 }
 
-for (let b = 0; b < NUM_BLOCKS; b++) {
+for (let b = 1; b <= NUM_BLOCKS; b++) {
   adaptive_n_back_experiment.push(start_adaptive_block);
   adaptive_n_back_experiment.push(adaptive_test_node);
   adaptive_n_back_experiment.push(update_delay_block);
 
-  if (b < NUM_BLOCKS - 1) { adaptive_n_back_experiment.push(game_break); }
+  if (b < NUM_BLOCKS) {
+    const fix_robot_video_block = {
+      stimulus: [(b >= fix_robot_videos.length) ? fix_robot_n : fix_robot_videos[b]],
+      type: videoKeyboardResponse,
+      ...video_parameters,
+    };
+    adaptive_n_back_experiment.push(fix_robot_video_block);
+  }
 
   adaptive_n_back_experiment.push(update_progress_bar_block);
 
@@ -732,8 +738,7 @@ if (SHOW_CONTROL_TRIALS && control_before === 1) {
 
 //
 adaptive_n_back_experiment.push(post_task_block);
-adaptive_n_back_experiment.push(end_block);
-// TODO: add end video
+adaptive_n_back_experiment.push(ending_video);
 
 timeline.push(...adaptive_n_back_experiment);
 timeline.push(exit_fullscreen);
