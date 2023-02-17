@@ -17,7 +17,8 @@ body {
 .right-arrow {
     height: 100%;
     width: 100%;
-    left:20px;right:0; 
+    left:20px;
+    right:0; 
     margin:auto; 
 
 }
@@ -34,7 +35,8 @@ body {
 .left-arrow {
     height: 100%;
     width: 100%;
-    left:20px;right:0;
+    left:20px;
+    right:0;
     margin:auto; 
 }
 
