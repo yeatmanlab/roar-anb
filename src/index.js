@@ -37,28 +37,28 @@ import {
 } from './utils';
 
 // assets
-import intro_video_1 from '../assets/intro-vid-pt-1.mp4';
-import intro_video_2 from '../assets/intro-vid-pt-2.mp4';
-import intro_video_3 from '../assets/intro-vid-pt-3.mp4';
-import game_instructions_1 from '../assets/game-instructions-1.mp4';
-import game_instructions_2 from '../assets/game-instructions-2.mp4';
-import game_instructions_3 from '../assets/game-instructions-3.mp4';
-import pos_instuctions_feedback from '../assets/instruction-fb-pos.mp4';
-import neg_instuctions_feedback from '../assets/instructions-fb-neg.mp4';
-import two_back_instructions from '../assets/two-back-instructions.mp4';
-import three_back_instructions from '../assets/three-back-instructions.mp4';
-import fix_robot_1 from '../assets/fix-robot-1.mp4';
-import fix_robot_2 from '../assets/fix-robot-2.mp4';
-import fix_robot_3 from '../assets/fix-robot-3.mp4';
-import fix_robot_4 from '../assets/fix-robot-4.mp4';
-import fix_robot_5 from '../assets/fix-robot-5.mp4';
-import fix_robot_6 from '../assets/fix-robot-6.mp4';
-import fix_robot_n from '../assets/fix-robot-n.mp4';
+import intro_1_video from '../assets/intro-vid-pt-1.mp4';
+import intro_2_video from '../assets/intro-vid-pt-2.mp4';
+import intro_3_video from '../assets/intro-vid-pt-3.mp4';
+import game_instructions_1_video from '../assets/game-instructions-1.mp4';
+import game_instructions_2_video from '../assets/game-instructions-2.mp4';
+import game_instructions_3_video from '../assets/game-instructions-3.mp4';
+import pos_instuctions_feedback_video from '../assets/instructions-fb-pos.mp4';
+import neg_instuctions_feedback_video from '../assets/instructions-fb-neg.mp4';
+import two_back_instructions_video from '../assets/two-back-instructions.mp4';
+import three_back_instructions_video from '../assets/three-back-instructions.mp4';
+import fix_robot_1_video from '../assets/fix-robot-1.mp4';
+import fix_robot_2_video from '../assets/fix-robot-2.mp4';
+import fix_robot_3_video from '../assets/fix-robot-3.mp4';
+import fix_robot_4_video from '../assets/fix-robot-4.mp4';
+import fix_robot_5_video from '../assets/fix-robot-5.mp4';
+import fix_robot_6_video from '../assets/fix-robot-6.mp4';
+import fix_robot_n_video from '../assets/fix-robot-n.mp4';
+import end_video from '../assets/end-video.mp4';
+import generic_game_break_video from '../assets/game-break.mp4';
 import right_arrow_image from '../assets/right-trial-screen-arrow.png';
 import left_arrow_image from '../assets/left-trial-screen-arrow.png';
-import end_video from '../assets/end-video.mp4';
-import generic_game_break from '../assets/game-break.mp4';
-import trial_screen_robot from '../assets/robot-no-bkgrnd.png';
+import trial_screen_robot_image from '../assets/robot-no-background.png';
 
 // ---------Initialize the jsPsych object and the timeline---------
 const config = await initConfig();
@@ -350,10 +350,8 @@ const feedback_trial = {
     // visual feedback trial after the stimulus is shown
     const last_trial_correct = jsPsych.data.get().last(2).values()[0].correct;
     if (last_trial_correct) {
-      // the parameter value has to be returned from the function
       return audioContent.feedbackCorrect;
     }
-    // the parameter value has to be returned from the function
     return audioContent.feedbackIncorrect;
   },
 };
@@ -370,7 +368,7 @@ function drawStim(stim, direction) {
     </div>
   </div>
   <div class="robot-div">
-  <img src="${trial_screen_robot}" class="stimulus-robot"></img>
+  <img src="${trial_screen_robot_image}" class="stimulus-robot"></img>
 </div>
   </div>`;
 }
@@ -414,6 +412,7 @@ for (let i = 0; i < PRACTICE_NUM_TRIALS; i++) {
     type: jsPsychHtmlKeyboardResponse,
     is_html: true,
     stimulus: () => {
+      // fetching the value of keyboard response from previous block
       const response = jsPsych.data.get().last(1).values()[0].response;
       return drawStim(stim, response);
     },
@@ -469,6 +468,7 @@ const adaptive_block_visual_feedback = {
   type: jsPsychHtmlKeyboardResponse,
   is_html: true,
   stimulus: () => {
+    // fetching the value of keyboard response from previous block
     const response = jsPsych.data.get().last(1).values()[0].response;
     return drawStim(getLatestStim(), response);
   },
@@ -501,24 +501,24 @@ const images = [
 ];
 
 const videos = [
-  intro_video_1,
-  intro_video_2,
-  intro_video_3,
-  game_instructions_1,
-  game_instructions_2,
-  game_instructions_3,
-  pos_instuctions_feedback,
-  neg_instuctions_feedback,
-  two_back_instructions,
-  three_back_instructions,
-  fix_robot_1,
-  fix_robot_2,
-  fix_robot_3,
-  fix_robot_4,
-  fix_robot_5,
-  fix_robot_6,
-  fix_robot_n,
-  generic_game_break,
+  intro_1_video,
+  intro_2_video,
+  intro_3_video,
+  game_instructions_1_video,
+  game_instructions_2_video,
+  game_instructions_3_video,
+  pos_instuctions_feedback_video,
+  neg_instuctions_feedback_video,
+  two_back_instructions_video,
+  three_back_instructions_video,
+  fix_robot_1_video,
+  fix_robot_2_video,
+  fix_robot_3_video,
+  fix_robot_4_video,
+  fix_robot_5_video,
+  fix_robot_6_video,
+  fix_robot_n_video,
+  generic_game_break_video,
 ];
 
 const preload_videos = {
@@ -541,40 +541,19 @@ const video_parameters = {
   height: VIDEO_HEIGHT,
 };
 
-const intro_video_node_1 = {
-  stimulus: [intro_video_1],
+const intro_video_1_node = {
+  stimulus: [intro_1_video],
   ...video_parameters,
 };
 
-const intro_video_node_2 = {
-  stimulus: [intro_video_2],
+const intro_video_2_node = {
+  stimulus: [intro_2_video],
   ...video_parameters,
 };
 
-const intro_video_node_3 = {
-  stimulus: [intro_video_3],
+const intro_video_3_node = {
+  stimulus: [intro_3_video],
   ...video_parameters,
-};
-
-// trying to figure out how to make it so that this will push only after the neg_instructions_fb
-// is pushed (and makes sure that they get it right )
-const neg_instuctions_feedback_parameters = {
-  type: videoKeyboardResponse,
-  trial_ends_after_video: false,
-  response_allowed_while_playing: true,
-  trial_duration: null,
-  choices: [CORRECT_KEY_PRESS, WRONG_KEY_PRESS],
-  width: VIDEO_WIDTH,
-  height: VIDEO_HEIGHT,
-  stimulus: () => {
-    const last_trial_correct = jsPsych.data.get().last(1).values()[0].correct;
-    if (last_trial_correct) {
-      // the parameter value has to be returned from the function
-      return [""];
-    }
-    // the parameter value has to be returned from the function
-    return [neg_instuctions_feedback];
-  },
 };
 
 const game_instructions_feedback_trial = {
@@ -586,29 +565,28 @@ const game_instructions_feedback_trial = {
   width: VIDEO_WIDTH,
   height: VIDEO_HEIGHT,
   stimulus: () => {
+    // checking if the last trial was correct to push appropriate feedback video
     const last_trial_correct = jsPsych.data.get().last(1).values()[0].correct;
     if (last_trial_correct) {
-      return [pos_instuctions_feedback];
+      return [pos_instuctions_feedback_video];
     }
-    return [neg_instuctions_feedback];
+    return [neg_instuctions_feedback_video];
   },
 };
 
-const game_instructions = {
-  stimulus: [game_instructions_1],
+const game_instructions_1_block = {
+  stimulus: [game_instructions_1_video],
   type: videoKeyboardResponse,
   trial_ends_after_video: false,
   response_allowed_while_playing: true,
   trial_duration: null,
-  width: 1440,
-  height: 1800,
+  width: VIDEO_WIDTH,
+  height: VIDEO_HEIGHT,
   data: {
     task: "practice_response",
-    correct_response: "CORRECT_KEY_PRESS",
   },
   choices: [CORRECT_KEY_PRESS, WRONG_KEY_PRESS],
   on_finish: (data) => {
-    // Score the response as correct or incorrect.
     // (right_arrow) {
     //   data.correct = jsPsych.pluginAPI.compareKeys(data.response, CORRECT_KEY_PRESS);
     // } else {
@@ -616,25 +594,25 @@ const game_instructions = {
   },
 };
 
-const game_instructions_cont1 = {
-  stimulus: [game_instructions_2],
+const game_instructions_2_block = {
+  stimulus: [game_instructions_2_video],
   type: videoKeyboardResponse,
   ...video_parameters,
 };
 
-const game_instructions_prac_finish = {
-  stimulus: [game_instructions_3],
+const game_instructions_3_block = {
+  stimulus: [game_instructions_3_video],
   type: videoKeyboardResponse,
   ...video_parameters,
 };
 
-const game_break = {
-  stimulus: [generic_game_break],
+const generic_game_break_block = {
+  stimulus: [generic_game_break_video],
   type: videoKeyboardResponse,
   ...video_parameters,
 };
 
-const ending_video = {
+const end_video_block = {
   stimulus: [end_video],
   type: videoKeyboardResponse,
   ...video_parameters,
@@ -642,29 +620,27 @@ const ending_video = {
 
 const instructions = [
   {}, // add dummy items for intuitive indexing
-  {
-
-  }, // add dummy items for intuitive indexing
+  {}, // add dummy items for intuitive indexing
   {
     // two-back instructions
-    video: two_back_instructions,
+    video: two_back_instructions_video,
     shown: false,
   },
   {
     // three-back instructions
-    video: three_back_instructions,
+    video: three_back_instructions_video,
     shown: false,
   },
 ];
 
 const fix_robot_videos = [
   {}, // dummy fix robot video
-  fix_robot_1,
-  fix_robot_2,
-  fix_robot_3,
-  fix_robot_4,
-  fix_robot_5,
-  fix_robot_6,
+  fix_robot_1_video,
+  fix_robot_2_video,
+  fix_robot_3_video,
+  fix_robot_4_video,
+  fix_robot_5_video,
+  fix_robot_6_video,
 ];
 
 const exit_fullscreen = {
@@ -681,23 +657,23 @@ adaptive_n_back_experiment.push(preloadAudio);
 adaptive_n_back_experiment.push(preload_videos);
 adaptive_n_back_experiment.push(preload_images);
 // intro videos
-adaptive_n_back_experiment.push(intro_video_node_1);
-adaptive_n_back_experiment.push(intro_video_node_2);
-adaptive_n_back_experiment.push(intro_video_node_3);
+adaptive_n_back_experiment.push(intro_video_1_node);
+adaptive_n_back_experiment.push(intro_video_2_node);
+adaptive_n_back_experiment.push(intro_video_3_node);
 // // 1-back instructions
-adaptive_n_back_experiment.push(game_instructions, game_instructions_feedback_trial);
-adaptive_n_back_experiment.push(game_instructions_cont1);
+adaptive_n_back_experiment.push(game_instructions_1_block, game_instructions_feedback_trial);
+adaptive_n_back_experiment.push(game_instructions_2_block);
 
 // practice block
 adaptive_n_back_experiment = adaptive_n_back_experiment.concat(practice_trials);
 adaptive_n_back_experiment.push(update_progress_bar_block);
-adaptive_n_back_experiment.push(game_instructions_prac_finish);
+adaptive_n_back_experiment.push(game_instructions_3_block);
 
 if (SHOW_CONTROL_TRIALS && control_before === 0) {
   adaptive_n_back_experiment.push(start_control_block);
   adaptive_n_back_experiment = adaptive_n_back_experiment.concat(control_trials);
   adaptive_n_back_experiment.push(update_progress_bar_block);
-  adaptive_n_back_experiment.push(game_break);
+  adaptive_n_back_experiment.push(generic_game_break_block);
 }
 
 for (let b = 1; b <= NUM_BLOCKS; b++) {
@@ -707,7 +683,7 @@ for (let b = 1; b <= NUM_BLOCKS; b++) {
 
   if (b < NUM_BLOCKS) {
     const fix_robot_video_block = {
-      stimulus: [(b >= fix_robot_videos.length) ? fix_robot_n : fix_robot_videos[b]],
+      stimulus: [(b >= fix_robot_videos.length) ? fix_robot_n_video : fix_robot_videos[b]],
       type: videoKeyboardResponse,
       ...video_parameters,
     };
@@ -729,16 +705,15 @@ for (let b = 1; b <= NUM_BLOCKS; b++) {
 
 if (SHOW_CONTROL_TRIALS && control_before === 1) {
   // do not show game break for last adaptive block, so we must show it before the control block
-  adaptive_n_back_experiment.push(game_break);
+  adaptive_n_back_experiment.push(generic_game_break_block);
   adaptive_n_back_experiment.push(start_control_block);
   adaptive_n_back_experiment = adaptive_n_back_experiment.concat(control_trials);
   adaptive_n_back_experiment.push(update_progress_bar_block);
   // do not show game break since this is the final block
 }
 
-//
 adaptive_n_back_experiment.push(post_task_block);
-adaptive_n_back_experiment.push(ending_video);
+adaptive_n_back_experiment.push(end_video_block);
 
 timeline.push(...adaptive_n_back_experiment);
 timeline.push(exit_fullscreen);
