@@ -93,7 +93,8 @@ const blockConfig = {
 /* Define helper functions */
 /* ************************************ */
 const updateProgressBar = () => {
-  const total_blocks = NUM_BLOCKS + 2; // additional blocks for practice and control
+  // additional blocks for practice and control
+  const total_blocks = NUM_BLOCKS + 1 + Number(SHOW_CONTROL_TRIALS);
   const curr_progress_bar_value = jsPsych.getProgressBarCompleted();
   jsPsych.setProgressBar(curr_progress_bar_value + 1 / total_blocks);
 };
@@ -186,6 +187,7 @@ const record_acc = (data) => {
 const update_delay = () => {
   const mistakes = ADAPTIVE_NUM_TRIALS - block_acc;
   if (delay >= 2) {
+    // TODO: think about how to make this number relate to total ADAPTIVE_NUM_TRIALS
     if (mistakes < 3) {
       delay += 1;
     } else if (mistakes > 5) {
@@ -298,11 +300,14 @@ const start_adaptive_block = {
     exp_stage: "adaptive",
     trial_id: "delay_text",
   },
-  stimulus: `<div class = "centerbox"><p class = "block-text">In these next blocks, you should press the ${CORRECT_KEY_TEXT} when the current letter matches the letter that appeared ${delay} trials before. Otherwise press the ${WRONG_KEY_TEXT}</p><p class = "center-block-text">Press <strong>enter</strong> to begin.</p></div>`,
+  stimulus: () => `<div class = "centerbox"><p class = "block-text">In these next blocks, you should press the ${CORRECT_KEY_TEXT} when the current letter matches the letter that appeared ${delay} trials before. Otherwise press the ${WRONG_KEY_TEXT}</p><p class = "center-block-text">Press <strong>enter</strong> to begin.</p></div>`,
   choices: ['Enter'],
   on_finish: () => {
     block_trial = 0;
     stims = [];
+
+    // adaptive trials have 'delay' more trials
+    // for instance, if delay = 2, number of trials = ADAPTIVE_NUM_TRIALS + 2
     trials_left = ADAPTIVE_NUM_TRIALS + delay;
     target_trials = [];
     for (let i = 0; i < delay; i++) {
@@ -616,6 +621,7 @@ const end_video_block = {
   stimulus: [end_video],
   type: videoKeyboardResponse,
   ...video_parameters,
+  on_finish: assessPerformance,
 };
 
 const instructions = [
@@ -660,7 +666,7 @@ adaptive_n_back_experiment.push(preload_images);
 adaptive_n_back_experiment.push(intro_video_1_node);
 adaptive_n_back_experiment.push(intro_video_2_node);
 adaptive_n_back_experiment.push(intro_video_3_node);
-// // 1-back instructions
+// 1-back instructions
 adaptive_n_back_experiment.push(game_instructions_1_block, game_instructions_feedback_trial);
 adaptive_n_back_experiment.push(game_instructions_2_block);
 
@@ -692,15 +698,21 @@ for (let b = 1; b <= NUM_BLOCKS; b++) {
 
   adaptive_n_back_experiment.push(update_progress_bar_block);
 
-  if (instructions[delay].shown !== undefined && !instructions[delay].shown) {
-    const delay_back_video = {
-      stimulus: [instructions[delay].video],
-      ...video_parameters,
-    };
+  const delay_back_video = {
+    stimulus: () => [instructions[delay].video],
+    ...video_parameters,
+    on_finish: () => {
+      instructions[delay].shown = true;
+    },
+  };
 
-    adaptive_n_back_experiment.push(delay_back_video);
-    instructions[delay].shown = true;
-  }
+  const if_delay_back_shown = {
+    timeline: [delay_back_video],
+    conditional_function: () => instructions[delay].shown !== undefined
+      && !instructions[delay].shown,
+  };
+
+  adaptive_n_back_experiment.push(if_delay_back_shown);
 }
 
 if (SHOW_CONTROL_TRIALS && control_before === 1) {
