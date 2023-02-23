@@ -7,10 +7,6 @@ import jsPsychCallFunction from '@jspsych/plugin-call-function';
 import jsPsychSurveyText from '@jspsych/plugin-survey-text';
 import jsPsychAudioKeyboardResponse from "@jspsych/plugin-audio-keyboard-response";
 import {
-  CORRECT_KEY_PRESS,
-  CORRECT_KEY_TEXT,
-  WRONG_KEY_PRESS,
-  WRONG_KEY_TEXT,
   audioContent,
   preloadAudio,
 } from 'roar-utils';
@@ -20,20 +16,49 @@ import 'regenerator-runtime/runtime';
 
 // CSS imports
 import './css/roar.css';
+import './css/custom.css';
 
 // Local modules
 import { initConfig, initRoarJsPsych, initRoarTimeline } from './config';
 import {
   NUM_BLOCKS,
-  NUM_TRIALS,
+  ADAPTIVE_NUM_TRIALS,
+  PRACTICE_NUM_TRIALS,
   CONTROL_NUM_TRIALS,
   SHOW_CONTROL_TRIALS,
   STIMULUS_FONT_SIZE,
+  VIDEO_HEIGHT,
+  VIDEO_WIDTH,
   IGNORE_CASE,
+  CORRECT_KEY_PRESS,
+  CORRECT_KEY_TEXT,
+  WRONG_KEY_PRESS,
+  WRONG_KEY_TEXT,
 } from './utils';
 
 // assets
-import intro_video from '../assets/intro-video.mp4';
+import intro_1_video from '../assets/intro-vid-pt-1.mp4';
+import intro_2_video from '../assets/intro-vid-pt-2.mp4';
+import intro_3_video from '../assets/intro-vid-pt-3.mp4';
+import game_instructions_1_video from '../assets/game-instructions-1.mp4';
+import game_instructions_2_video from '../assets/game-instructions-2.mp4';
+import game_instructions_3_video from '../assets/game-instructions-3.mp4';
+import pos_instuctions_feedback_video from '../assets/instructions-fb-pos.mp4';
+import neg_instuctions_feedback_video from '../assets/instructions-fb-neg.mp4';
+import two_back_instructions_video from '../assets/two-back-instructions.mp4';
+import three_back_instructions_video from '../assets/three-back-instructions.mp4';
+import fix_robot_1_video from '../assets/fix-robot-1.mp4';
+import fix_robot_2_video from '../assets/fix-robot-2.mp4';
+import fix_robot_3_video from '../assets/fix-robot-3.mp4';
+import fix_robot_4_video from '../assets/fix-robot-4.mp4';
+import fix_robot_5_video from '../assets/fix-robot-5.mp4';
+import fix_robot_6_video from '../assets/fix-robot-6.mp4';
+import fix_robot_n_video from '../assets/fix-robot-n.mp4';
+import end_video from '../assets/end-video.mp4';
+import generic_game_break_video from '../assets/game-break.mp4';
+import right_arrow_image from '../assets/right-trial-screen-arrow.png';
+import left_arrow_image from '../assets/left-trial-screen-arrow.png';
+import trial_screen_robot_image from '../assets/robot-no-background.png';
 
 // ---------Initialize the jsPsych object and the timeline---------
 const config = await initConfig();
@@ -50,7 +75,7 @@ let credit_let = true; // default to true
 const letters = 'bBdDgGtTvV'.split("");
 const control_before = Math.round(Math.random()); // 0 control comes before test, 1, after
 let block_acc = 0; // record block accuracy to determine next blocks delay
-let delay = 2; // starting delay
+let delay = 1; // starting delay
 let trials_left = 0; // counter used by adaptive_test_node
 let target_trials = []; // array defining whether each trial in a block is a target trial
 let current_trial = 0;
@@ -68,7 +93,8 @@ const blockConfig = {
 /* Define helper functions */
 /* ************************************ */
 const updateProgressBar = () => {
-  const total_blocks = NUM_BLOCKS + 2; // additional blocks for practice and control
+  // additional blocks for practice and control
+  const total_blocks = NUM_BLOCKS + 1 + Number(SHOW_CONTROL_TRIALS);
   const curr_progress_bar_value = jsPsych.getProgressBarCompleted();
   jsPsych.setProgressBar(curr_progress_bar_value + 1 / total_blocks);
 };
@@ -122,11 +148,6 @@ function assessPerformance() {
   jsPsych.data.addDataToLastTrial({ credit_let: credit_let });
 }
 
-const getInstructFeedback = () => {
-  const feedback_instruct_text = 'Welcome to the experiment. This task will take around 20 minutes. Press <strong>enter</strong> to begin.';
-  return `<div class = "centerbox"><p class = center-block-text>${feedback_instruct_text}</p></div>`;
-};
-
 const randomDraw = (lst) => {
   const index = Math.floor(Math.random() * (lst.length));
   return lst[index];
@@ -164,8 +185,9 @@ const record_acc = (data) => {
 };
 
 const update_delay = () => {
-  const mistakes = NUM_TRIALS - block_acc;
+  const mistakes = ADAPTIVE_NUM_TRIALS - block_acc;
   if (delay >= 2) {
+    // TODO: think about how to make this number relate to total ADAPTIVE_NUM_TRIALS
     if (mistakes < 3) {
       delay += 1;
     } else if (mistakes > 5) {
@@ -187,10 +209,6 @@ const update_target = () => {
     target = "";
   }
 };
-
-function drawStim(stim) {
-  return `<div class = "centerbox"><div class = center-text><p style="font-size: ${STIMULUS_FONT_SIZE}px">${stim}</p></div></div>`;
-}
 
 const getStim = () => {
   const trial_type = target_trials.shift();
@@ -215,6 +233,8 @@ const getStim = () => {
   return drawStim(curr_stim);
 };
 
+const getLatestStim = () => stims.slice(-1)[0];
+
 /* ************************************ */
 /* Set up jsPsych blocks */
 /* ************************************ */
@@ -232,59 +252,6 @@ const post_task_block = {
   ],
   rows: [15, 15],
   columns: [60, 60],
-};
-
-/* define static blocks */
-const feedback_instruct_block = {
-  type: jsPsychHtmlKeyboardResponse,
-  data: {
-    trial_id: 'instruction',
-  },
-  stimulus: getInstructFeedback,
-  choices: ['Enter'],
-};
-
-const instructions_block = {
-  type: jsPsychHtmlKeyboardResponse,
-  stimulus: (() => {
-    let html = `<div class = "centerbox"><p class = "block-text">In this experiment you will see a sequence of letters presented one at a time. Your job is to respond by pressing the <strong>${CORRECT_KEY_TEXT}</strong> when the letter matches the same letter that occured some number of trials before (the number of trials is called the "delay"), otherwise you should press the <strong>${WRONG_KEY_TEXT}</strong>. The letters will be both lower and upper case. ${IGNORE_CASE ? 'You should ignore the case (so "t" matches "T"), the letters are case-insensitive' : 'You should care about the case (so "t" only matches "t" and not "T"), the letters are case-sensitive'}.</p><p class = block-text>The specific delay you should pay attention to will differ between blocks of trials, and you will be told the delay before starting a block.</p><p class = block-text>For instance, if the delay is 2, you are supposed to press the ${CORRECT_KEY_TEXT} when the current letter matches the letter that occurred 2 trials ago. If you saw the sequence: g...G...v...T...b...t...b, you would press the ${CORRECT_KEY_TEXT} on the last "t" and the last "b" and the ${WRONG_KEY_TEXT} for every other letter.</p>`;
-
-    if (SHOW_CONTROL_TRIALS) {
-      html += `<p class = block-text>On one block of trials there will be no delay. On this block you will be instructed to press the ${CORRECT_KEY_TEXT} to the presentation of a specific letter on that trial. For instance, the specific letter may be "t", in which case you would press the ${CORRECT_KEY_TEXT} to "t"${IGNORE_CASE ? 'or "T"' : ''}.</p>`;
-    }
-
-    html += `<p class = block-text>Press <strong>enter</strong> to continue.</p></div>`;
-
-    return html;
-  })(),
-  data: {
-    trial_id: 'instruction',
-  },
-  choices: ['Enter'],
-};
-
-const instruction_node = {
-  timeline: [feedback_instruct_block, instructions_block],
-};
-
-const end_block = {
-  type: jsPsychHtmlKeyboardResponse,
-  stimulus: '<div class = "centerbox"><p class = "center-block-text">Thanks for completing this task!</p><p class = center-block-text>Press <strong>enter</strong> to begin.</p></div>',
-  choices: ['Enter'],
-  data: {
-    trial_id: "end",
-    exp_id: 'adaptive_n_back',
-  },
-  on_finish: assessPerformance,
-};
-
-const start_practice_block = {
-  type: jsPsychHtmlKeyboardResponse,
-  stimulus: `<div class = "centerbox"><p class = "block-text">Starting practice. During practice, you should press the ${CORRECT_KEY_TEXT} when the current letter matches the letter that appeared 1 trial before. Otherwise press the ${WRONG_KEY_TEXT}</p><p class = center-block-text>You will receive feedback about whether you were correct or not during practice. There will be no feedback during the main experiment. Press <strong>enter</strong> to begin.</p></div>`,
-  choices: ['Enter'],
-  data: {
-    trial_id: "instruction",
-  },
 };
 
 const update_delay_block = {
@@ -333,19 +300,22 @@ const start_adaptive_block = {
     exp_stage: "adaptive",
     trial_id: "delay_text",
   },
-  stimulus: `<div class = "centerbox"><p class = "block-text">In these next blocks, you should press the ${CORRECT_KEY_TEXT} when the current letter matches the letter that appeared ${delay} trials before. Otherwise press the ${WRONG_KEY_TEXT}</p><p class = "center-block-text">Press <strong>enter</strong> to begin.</p></div>`,
+  stimulus: () => `<div class = "centerbox"><p class = "block-text">In these next blocks, you should press the ${CORRECT_KEY_TEXT} when the current letter matches the letter that appeared ${delay} trials before. Otherwise press the ${WRONG_KEY_TEXT}</p><p class = "center-block-text">Press <strong>enter</strong> to begin.</p></div>`,
   choices: ['Enter'],
   on_finish: () => {
     block_trial = 0;
     stims = [];
-    trials_left = NUM_TRIALS + delay;
+
+    // adaptive trials have 'delay' more trials
+    // for instance, if delay = 2, number of trials = ADAPTIVE_NUM_TRIALS + 2
+    trials_left = ADAPTIVE_NUM_TRIALS + delay;
     target_trials = [];
     for (let i = 0; i < delay; i++) {
       target_trials.push('0');
     }
     let trials_to_add = [];
     for (let j = 0; j < (trials_left - delay); j++) {
-      if (j < (Math.round(NUM_TRIALS / 3))) {
+      if (j < (Math.round(ADAPTIVE_NUM_TRIALS / 3))) {
         trials_to_add.push('target');
       } else {
         trials_to_add.push('0');
@@ -381,19 +351,36 @@ const feedback_trial = {
     // the stimulus should be 'correct' or 'incorrect'.
     // Instead, this function will check the accuracy of the last response
     // and use that information to set the stimulus value on each trial.
-    const last_trial_correct = jsPsych.data.get().last(1).values()[0].correct;
+    // we look up 2 trials back because we also add a
+    // visual feedback trial after the stimulus is shown
+    const last_trial_correct = jsPsych.data.get().last(2).values()[0].correct;
     if (last_trial_correct) {
-      // the parameter value has to be returned from the function
       return audioContent.feedbackCorrect;
     }
-    // the parameter value has to be returned from the function
     return audioContent.feedbackIncorrect;
   },
 };
 
+function drawStim(stim, direction) {
+  return `<div class = "centerbox"><div class="center-text stimulus-circle">
+    <p style="font-size: ${STIMULUS_FONT_SIZE}px" class="stimulus-stext">${stim}</p>
+    <div class="arrow-div">
+    <div class="right-arrow-div" id="${(jsPsych.pluginAPI.compareKeys(direction, "ArrowRight")) ? "arrow-bg-color" : ''}">
+      <img src="${right_arrow_image}" class="right-arrow"></img>
+    </div>
+    <div class="left-arrow-div" id="${(jsPsych.pluginAPI.compareKeys(direction, "ArrowLeft")) ? "arrow-bg-color" : ''}">
+    <img src="${left_arrow_image}" class="left-arrow"></img>
+    </div>
+  </div>
+  <div class="robot-div">
+  <img src="${trial_screen_robot_image}" class="stimulus-robot"></img>
+</div>
+  </div>`;
+}
+
 // Setup 1-back practice
 const practice_trials = [];
-for (let i = 0; i < (NUM_TRIALS + 1); i++) {
+for (let i = 0; i < PRACTICE_NUM_TRIALS; i++) {
   const stim = randomDraw(letters);
   stims.push(stim);
   if (i >= 1) {
@@ -426,7 +413,26 @@ for (let i = 0; i < (NUM_TRIALS + 1); i++) {
     },
   };
 
-  practice_trials.push(practice_block, feedback_trial);
+  const practice_block_visual_feedback = {
+    type: jsPsychHtmlKeyboardResponse,
+    is_html: true,
+    stimulus: () => {
+      // fetching the value of keyboard response from previous block
+      const response = jsPsych.data.get().last(1).values()[0].response;
+      return drawStim(stim, response);
+    },
+    trial_duration: 300,
+    data: {
+      trial_id: "stim",
+      exp_stage: "practice",
+      stim: stim,
+      target: target,
+      save_trial: true,
+    },
+    choices: [],
+  };
+
+  practice_trials.push(practice_block, practice_block_visual_feedback, feedback_trial);
 }
 
 // Define control (0-back) block
@@ -463,8 +469,27 @@ for (let i = 0; i < CONTROL_NUM_TRIALS; i++) {
   control_trials.push(control_block, feedback_trial);
 }
 
+const adaptive_block_visual_feedback = {
+  type: jsPsychHtmlKeyboardResponse,
+  is_html: true,
+  stimulus: () => {
+    // fetching the value of keyboard response from previous block
+    const response = jsPsych.data.get().last(1).values()[0].response;
+    return drawStim(getLatestStim(), response);
+  },
+  trial_duration: 300,
+  data: {
+    trial_id: "stim",
+    exp_stage: "practice",
+    stim: getLatestStim,
+    target: target,
+    save_trial: true,
+  },
+  choices: [],
+};
+
 const adaptive_test_node = {
-  timeline: [update_target_block, adaptive_block, feedback_trial],
+  timeline: [update_target_block, adaptive_block, adaptive_block_visual_feedback, feedback_trial],
   loop_function: () => {
     trials_left -= 1;
     if (trials_left === 0) {
@@ -475,10 +500,154 @@ const adaptive_test_node = {
 };
 
 // trials to add gamification
-const preload_intro_video = {
+const images = [
+  left_arrow_image,
+  right_arrow_image,
+];
+
+const videos = [
+  intro_1_video,
+  intro_2_video,
+  intro_3_video,
+  game_instructions_1_video,
+  game_instructions_2_video,
+  game_instructions_3_video,
+  pos_instuctions_feedback_video,
+  neg_instuctions_feedback_video,
+  two_back_instructions_video,
+  three_back_instructions_video,
+  fix_robot_1_video,
+  fix_robot_2_video,
+  fix_robot_3_video,
+  fix_robot_4_video,
+  fix_robot_5_video,
+  fix_robot_6_video,
+  fix_robot_n_video,
+  generic_game_break_video,
+];
+
+const preload_videos = {
   type: jsPsychPreload,
-  video: intro_video,
+  video: videos,
 };
+
+const preload_images = {
+  type: jsPsychPreload,
+  image: images,
+};
+
+const video_parameters = {
+  type: videoKeyboardResponse,
+  trial_ends_after_video: false,
+  response_allowed_while_playing: true,
+  trial_duration: null,
+  choices: "ALL_KEYS",
+  width: VIDEO_WIDTH,
+  height: VIDEO_HEIGHT,
+};
+
+const intro_video_1_node = {
+  stimulus: [intro_1_video],
+  ...video_parameters,
+};
+
+const intro_video_2_node = {
+  stimulus: [intro_2_video],
+  ...video_parameters,
+};
+
+const intro_video_3_node = {
+  stimulus: [intro_3_video],
+  ...video_parameters,
+};
+
+const game_instructions_feedback_trial = {
+  type: videoKeyboardResponse,
+  trial_ends_after_video: true,
+  response_allowed_while_playing: true,
+  trial_duration: null,
+  choices: "ALL_KEYS",
+  width: VIDEO_WIDTH,
+  height: VIDEO_HEIGHT,
+  stimulus: () => {
+    // checking if the last trial was correct to push appropriate feedback video
+    const last_trial_correct = jsPsych.data.get().last(1).values()[0].correct;
+    if (last_trial_correct) {
+      return [pos_instuctions_feedback_video];
+    }
+    return [neg_instuctions_feedback_video];
+  },
+};
+
+const game_instructions_1_block = {
+  stimulus: [game_instructions_1_video],
+  type: videoKeyboardResponse,
+  trial_ends_after_video: false,
+  response_allowed_while_playing: true,
+  trial_duration: null,
+  width: VIDEO_WIDTH,
+  height: VIDEO_HEIGHT,
+  data: {
+    task: "practice_response",
+  },
+  choices: [CORRECT_KEY_PRESS, WRONG_KEY_PRESS],
+  on_finish: (data) => {
+    // (right_arrow) {
+    //   data.correct = jsPsych.pluginAPI.compareKeys(data.response, CORRECT_KEY_PRESS);
+    // } else {
+    data.correct = jsPsych.pluginAPI.compareKeys(data.response, CORRECT_KEY_PRESS);
+  },
+};
+
+const game_instructions_2_block = {
+  stimulus: [game_instructions_2_video],
+  type: videoKeyboardResponse,
+  ...video_parameters,
+};
+
+const game_instructions_3_block = {
+  stimulus: [game_instructions_3_video],
+  type: videoKeyboardResponse,
+  ...video_parameters,
+};
+
+const generic_game_break_block = {
+  stimulus: [generic_game_break_video],
+  type: videoKeyboardResponse,
+  ...video_parameters,
+};
+
+const end_video_block = {
+  stimulus: [end_video],
+  type: videoKeyboardResponse,
+  ...video_parameters,
+  on_finish: assessPerformance,
+};
+
+const instructions = [
+  {}, // add dummy items for intuitive indexing
+  {}, // add dummy items for intuitive indexing
+  {
+    // two-back instructions
+    video: two_back_instructions_video,
+    shown: false,
+  },
+  {
+    // three-back instructions
+    video: three_back_instructions_video,
+    shown: false,
+  },
+];
+
+const fix_robot_videos = [
+  {}, // dummy fix robot video
+  fix_robot_1_video,
+  fix_robot_2_video,
+  fix_robot_3_video,
+  fix_robot_4_video,
+  fix_robot_5_video,
+  fix_robot_6_video,
+];
 
 const exit_fullscreen = {
   type: jsPsychFullScreen,
@@ -486,51 +655,77 @@ const exit_fullscreen = {
   delay_after: 0,
 };
 
-const intro_video_node = {
-  type: videoKeyboardResponse,
-  stimulus: [intro_video],
-  trial_ends_after_video: true,
-  response_allowed_while_playing: true,
-  trial_duration: null,
-  choices: 'NO_KEYS ',
-};
-
 // set up the experiment
 let adaptive_n_back_experiment = [];
 
 // preload assets
 adaptive_n_back_experiment.push(preloadAudio);
-adaptive_n_back_experiment.push(preload_intro_video);
+adaptive_n_back_experiment.push(preload_videos);
+adaptive_n_back_experiment.push(preload_images);
+// intro videos
+adaptive_n_back_experiment.push(intro_video_1_node);
+adaptive_n_back_experiment.push(intro_video_2_node);
+adaptive_n_back_experiment.push(intro_video_3_node);
+// 1-back instructions
+adaptive_n_back_experiment.push(game_instructions_1_block, game_instructions_feedback_trial);
+adaptive_n_back_experiment.push(game_instructions_2_block);
 
-adaptive_n_back_experiment.push(intro_video_node);
-
-adaptive_n_back_experiment.push(instruction_node);
-adaptive_n_back_experiment.push(start_practice_block);
+// practice block
 adaptive_n_back_experiment = adaptive_n_back_experiment.concat(practice_trials);
 adaptive_n_back_experiment.push(update_progress_bar_block);
+adaptive_n_back_experiment.push(game_instructions_3_block);
 
 if (SHOW_CONTROL_TRIALS && control_before === 0) {
   adaptive_n_back_experiment.push(start_control_block);
   adaptive_n_back_experiment = adaptive_n_back_experiment.concat(control_trials);
   adaptive_n_back_experiment.push(update_progress_bar_block);
+  adaptive_n_back_experiment.push(generic_game_break_block);
 }
 
-for (let b = 0; b < NUM_BLOCKS; b++) {
+for (let b = 1; b <= NUM_BLOCKS; b++) {
   adaptive_n_back_experiment.push(start_adaptive_block);
   adaptive_n_back_experiment.push(adaptive_test_node);
   adaptive_n_back_experiment.push(update_delay_block);
+
+  if (b < NUM_BLOCKS) {
+    const fix_robot_video_block = {
+      stimulus: [(b >= fix_robot_videos.length) ? fix_robot_n_video : fix_robot_videos[b]],
+      type: videoKeyboardResponse,
+      ...video_parameters,
+    };
+    adaptive_n_back_experiment.push(fix_robot_video_block);
+  }
+
   adaptive_n_back_experiment.push(update_progress_bar_block);
+
+  const delay_back_video = {
+    stimulus: () => [instructions[delay].video],
+    ...video_parameters,
+    on_finish: () => {
+      instructions[delay].shown = true;
+    },
+  };
+
+  const if_delay_back_shown = {
+    timeline: [delay_back_video],
+    conditional_function: () => instructions[delay].shown !== undefined
+      && !instructions[delay].shown,
+  };
+
+  adaptive_n_back_experiment.push(if_delay_back_shown);
 }
 
 if (SHOW_CONTROL_TRIALS && control_before === 1) {
+  // do not show game break for last adaptive block, so we must show it before the control block
+  adaptive_n_back_experiment.push(generic_game_break_block);
   adaptive_n_back_experiment.push(start_control_block);
   adaptive_n_back_experiment = adaptive_n_back_experiment.concat(control_trials);
   adaptive_n_back_experiment.push(update_progress_bar_block);
+  // do not show game break since this is the final block
 }
 
-// set up control
 adaptive_n_back_experiment.push(post_task_block);
-adaptive_n_back_experiment.push(end_block);
+adaptive_n_back_experiment.push(end_video_block);
 
 timeline.push(...adaptive_n_back_experiment);
 timeline.push(exit_fullscreen);
