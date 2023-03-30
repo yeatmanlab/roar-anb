@@ -147,8 +147,6 @@ const updateProgressBar = () => {
   jsPsych.setProgressBar(curr_progress_bar_value + 1 / total_blocks);
 };
 
-// TODO: repasar las trials cuando le digo que lo haga save para confirmar que tengo que salvar los
-
 function assessPerformance() {
   /*
    * Function to calculate the "credit_let", which is a boolean
@@ -261,10 +259,8 @@ const update_target = () => {
 };
 
 function drawStim(stim, feedback) {
-  console.log("stim", stim);
   const last_trial_data = jsPsych.data.get().last(1).values()[0];
   const direction = last_trial_data?.response || null;
-  console.log('direction', direction);
   let delay_prompt_text = "";
   if (delay === 1) {
     delay_prompt_text = 'Matching back to back';
@@ -651,8 +647,6 @@ const instructions_1_block = {
   choices: "ALL_KEYS",
   on_finish: (data) => {
     data.correct = jsPsych.pluginAPI.compareKeys(data.response, CORRECT_KEY_PRESS);
-  console.log('data.response', data.response);
-  console.log('correct key press', CORRECT_KEY_PRESS);
   },
   prompt: `<div class = "background">
   <img class = "lab-background-image" src="${lab_background_image}"></img>  
@@ -961,7 +955,6 @@ function getNbackPracticeTrials() {
         exp_stage: "static_practice",
         stim: stim || null,
         stimIndex: i,
-        // PREGUNTA: guardamos los datos de la practica?
         save_trial: true,
       },
       choices: [CORRECT_KEY_PRESS, WRONG_KEY_PRESS],
