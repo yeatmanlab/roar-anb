@@ -1,5 +1,5 @@
 export const NUM_BLOCKS = 8;
-export const ADAPTIVE_NUM_TRIALS = 1;
+export const ADAPTIVE_NUM_TRIALS = 12;
 export const PRACTICE_NUM_TRIALS = 8;
 export const CONTROL_NUM_TRIALS = 42;
 export const SHOW_CONTROL_TRIALS = false;

@@ -868,7 +868,7 @@ function practice2BackSecondStimFeedback() {
         <img class="catleft" src="${cat_left_arrow_flash_gif}"></img>
         </div>
       <div class="text-box">
-        <p class="middle"> <strong> Remember, press the <span class="right-arrow-blue">RIGHT arrow key when the letters match</span> and the <span class="left-arrow-red">LEFT arrow key when the letters do not match</span>.</strong> <br/> <br/> We're practicing to recognize matching letters with the one 2 screens ago. <br/> <br/> Our last screens were ${staticStims[1]}, ${staticStims[0]}, and nothing. That means you were comparing ${staticStims[1]} and nothing since it didn't have a screen 2 before it. <br/> <br/> You hit the ${is_right_arrow ? "right" : "left"} arrow key which is for ${is_right_arrow ? "match" : "not a match"}! <br/> <br/> Since ${staticStims[1]} doesn't have anything to match to 2 screens ago, that's ${data.correct ? "correct." : "incorrect!"} We'd press the <span class="left-arrow-red">LEFT arrow key</span>.</p> 
+        <p class="middle"> <strong> Remember, press the <span class="right-arrow-blue">RIGHT arrow key when the letters match</span> and the <span class="left-arrow-red">LEFT arrow key when the letters do not match</span>.</strong> <br/> <br/> We're practicing to recognize matching letters with the one 2 screens ago. <br/> <br/> Our last screens were ${staticStims[1]}, ${staticStims[0]}, and nothing. That means you were comparing ${staticStims[1]} and nothing since it didn't have a screen 2 before it. <br/> <br/> You hit the ${is_right_arrow ? "right" : "left"} arrow key which is for ${is_right_arrow ? "match" : "not a match"}! <br/> <br/> Since ${staticStims[1]} doesn't have anything to match to 2 screens ago, that's ${data.correct ? "correct!" : "incorrect."} We'd press the <span class="left-arrow-red">LEFT arrow key</span>.</p> 
       </div>
     </div>
   <div class="press-key">Press <span class="button-text">the LEFT arrow key</span> to continue. </div>`;
@@ -900,7 +900,6 @@ two_back_feedback_trials.push({
   },
 });
 two_back_feedback_trials.push({
-  // TODO: make a new function here that has different html
   ...practice2BackSecondStimFeedback(1),
   stimulus: () => {
     const correct_repsonse = jsPsych.data.get().last(3).values()[0].correct;
@@ -927,7 +926,6 @@ for (let i = 1; i < staticStims.length; i++) {
 
 for (let i = 2; i < staticStims.length; i++) {
   const two_back_feedback_audio_block = {
-    // TODO: make a new function here that has different html
     ...getCommonTwoBackProperties(i),
     stimulus: () => {
       const correct_response = jsPsych.data.get().last(3).values()[0].correct;
@@ -1107,7 +1105,7 @@ const game_break_4_block = {
     <img class="catleft" src="${game_break_4_gif}"></img>
     </div>
     <div class="text-box" style="border-radius:30%">
-    <p class="middle"> <span style="font-size: 5vh; color: rgba(76,101,139,1); text-align: center; ">Woah, that's amazing!</span> <br/> <br/> Robot looks just like the instruction book said he would. Now, I need you to help our robot friend game some memroy skills of his own. Let's do it! </p>  
+    <p class="middle"> <span style="font-size: 5vh; color: rgba(76,101,139,1); text-align: center; ">Woah, that's amazing!</span> <br/> <br/> Robot looks just like the instruction book said he would. Now, I need you to help our robot friend game some memory skills of his own. Let's do it! </p>  
     </div>
   </div>
 <div class="press-key">Press <span class="button-text">ANY KEY</span> continue.</div>`,
@@ -1145,7 +1143,7 @@ const game_break_6_block = {
     <img class="catleft" src="${game_break_6_gif}"></img>
     </div>
     <div class="text-box" style="border-radius:30%">
-    <p class="middle"> Mr. Robot is going to have an amazing memory!.</p>  
+    <p class="middle"> Mr. Robot is going to have an amazing memory!</p>  
     </div>
   </div>
 <div class="press-key">Press <span class="button-text">ANY KEY</span> continue.</div>`,
@@ -1313,7 +1311,7 @@ const start_adaptive_block = {
     exp_stage: "adaptive",
     trial_id: "delay_text",
   },
-  stimulus: () => `<div class = "centerbox"> <h1 class = "block-text"> Now, you're looking for matching letters between ${delay} screen${(delay === 1) ? "" : "s"}!</h1>  <p class = "block-text">You should press the <span class="right-arrow-blue">${CORRECT_KEY_TEXT}</span> when the current letter matches the letter that appeared ${delay} screen${(delay === 1) ? "" : "s"} before. Otherwise, press the <span class="left-arrow-red">${WRONG_KEY_TEXT}</span></p>
+  stimulus: () => `<div class = "centerbox"> <h1 class = "block-text"> Now, you're looking for matching letters between ${delay} screen${(delay === 1) ? "" : "s"}!</h1>  <p class = "block-text">You should press the <span class="right-arrow-blue">${CORRECT_KEY_TEXT}</span> when the current letter matches the letter that appeared ${delay} screen${(delay === 1) ? "" : "s"} before. Otherwise, press the <span class="left-arrow-red">${WRONG_KEY_TEXT}.</span></p>
   <div><p class = "block-text"><strong>${(delay <= 3) ? "Press Y if you'd like to listen to the instructions again." : ""}</strong> </p></div>, 
   <div class="press-key">Press the<span class ="button-text"> SPACE BAR</span> to begin the next round.</div>`,
   choices: [" ", "y", "n", "Y", "N"],
