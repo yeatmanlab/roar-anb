@@ -123,7 +123,8 @@ const letters = 'bBdDgGtTvV'.split("");
 const control_before = Math.round(Math.random()); // 0 control comes before test, 1, after
 let block_acc = 0; // record block accuracy to determine next blocks delay
 let delay = 1; // starting delay
-let if_last_y = 0; // this is to track if the last response is y or not 
+let previous_delay = -1;
+let if_last_y = 0; // this is to track if the last response is y or not
 let trials_left = 0; // counter used by adaptive_test_node
 let target_trials = []; // array defining whether each trial in a block is a target trial
 let current_trial = 0;
@@ -234,6 +235,7 @@ const record_acc = (data) => {
 
 const update_delay = () => {
   const mistakes = ADAPTIVE_NUM_TRIALS - block_acc;
+  previous_delay = delay;
   if (delay >= 2) {
     // TODO: think about how to make this number relate to total ADAPTIVE_NUM_TRIALS
     if (mistakes < 3) {
@@ -1204,6 +1206,7 @@ const end_game_block = {
     </div>
   </div>
 <div class="press-key">Press <span class="button-text">ANY KEY</span> to sign off.</div>`,
+  on_finish: assessPerformance,
 };
 
 const level_up_block = {
@@ -1396,32 +1399,32 @@ adaptive_n_back_experiment.push(preload_images);
 
 // intro trials
 
-adaptive_n_back_experiment.push(welcome_screen_block);
-adaptive_n_back_experiment.push(intro_1_block);
-adaptive_n_back_experiment.push(intro_2_block);
-adaptive_n_back_experiment.push(intro_3_block);
-adaptive_n_back_experiment.push(intro_4_block);
-// // beginning instruction trials
-adaptive_n_back_experiment.push(instructions_1_block);
+// adaptive_n_back_experiment.push(welcome_screen_block);
+// adaptive_n_back_experiment.push(intro_1_block);
+// adaptive_n_back_experiment.push(intro_2_block);
+// adaptive_n_back_experiment.push(intro_3_block);
+// adaptive_n_back_experiment.push(intro_4_block);
+// // // beginning instruction trials
+// adaptive_n_back_experiment.push(instructions_1_block);
 
 // having player find right arrow key
-const right_arrow_redo = {
-  timeline: [right_arrow_feedback_node],
-  loop_function: function () {
-    const last_trial_correct = jsPsych.data.get().last(2).values()[0].correct;
-    if (last_trial_correct) {
-      return false;
-    }
-    return true;
-  },
-};
-adaptive_n_back_experiment.push(right_arrow_redo);
-adaptive_n_back_experiment.push(instructions_2_block);
+// const right_arrow_redo = {
+//   timeline: [right_arrow_feedback_node],
+//   loop_function: function () {
+//     const last_trial_correct = jsPsych.data.get().last(2).values()[0].correct;
+//     if (last_trial_correct) {
+//       return false;
+//     }
+//     return true;
+//   },
+// };
+// adaptive_n_back_experiment.push(right_arrow_redo);
+// adaptive_n_back_experiment.push(instructions_2_block);
 
 // practice block //
-adaptive_n_back_experiment = adaptive_n_back_experiment.concat(getNbackPracticeTrials(1));
-adaptive_n_back_experiment.push(update_progress_bar_block);
-adaptive_n_back_experiment.push(instructions_3_block);
+// adaptive_n_back_experiment = adaptive_n_back_experiment.concat(getNbackPracticeTrials(1));
+// adaptive_n_back_experiment.push(update_progress_bar_block);
+// adaptive_n_back_experiment.push(instructions_3_block);
 
 if (SHOW_CONTROL_TRIALS && control_before === 0) {
   adaptive_n_back_experiment.push(start_control_block);
@@ -1431,7 +1434,6 @@ if (SHOW_CONTROL_TRIALS && control_before === 0) {
 }
 
 for (let b = 1; b <= NUM_BLOCKS; b++) {
-  const previous_delay = delay;
   adaptive_n_back_experiment.push(instructions_loop);
   adaptive_n_back_experiment.push(adaptive_test_node);
   adaptive_n_back_experiment.push(update_delay_block);
@@ -1443,14 +1445,18 @@ for (let b = 1; b <= NUM_BLOCKS; b++) {
     adaptive_n_back_experiment.push(grab_game_break_node);
 
     const if_level_up_node = {
-      timeline: level_up_block,
+      timeline: [level_up_block],
       conditional_function: () => (delay - previous_delay > 0),
     };
 
     const if_level_down_node = {
-      timeline: level_down_block,
-      conditional_function: () => (delay - previous_delay > 0),
+      timeline: [level_down_block],
+      conditional_function: () => {
+        console.log('delay', delay, 'previous delay', previous_delay);
+        return (delay - previous_delay < 0);
+      },
     };
+
 
     adaptive_n_back_experiment.push(if_level_up_node);
     adaptive_n_back_experiment.push(if_level_down_node);
