@@ -1399,32 +1399,32 @@ adaptive_n_back_experiment.push(preload_images);
 
 // intro trials
 
-// adaptive_n_back_experiment.push(welcome_screen_block);
-// adaptive_n_back_experiment.push(intro_1_block);
-// adaptive_n_back_experiment.push(intro_2_block);
-// adaptive_n_back_experiment.push(intro_3_block);
-// adaptive_n_back_experiment.push(intro_4_block);
-// // // beginning instruction trials
-// adaptive_n_back_experiment.push(instructions_1_block);
+adaptive_n_back_experiment.push(welcome_screen_block);
+adaptive_n_back_experiment.push(intro_1_block);
+adaptive_n_back_experiment.push(intro_2_block);
+adaptive_n_back_experiment.push(intro_3_block);
+adaptive_n_back_experiment.push(intro_4_block);
+// // beginning instruction trials
+adaptive_n_back_experiment.push(instructions_1_block);
 
 // having player find right arrow key
-// const right_arrow_redo = {
-//   timeline: [right_arrow_feedback_node],
-//   loop_function: function () {
-//     const last_trial_correct = jsPsych.data.get().last(2).values()[0].correct;
-//     if (last_trial_correct) {
-//       return false;
-//     }
-//     return true;
-//   },
-// };
-// adaptive_n_back_experiment.push(right_arrow_redo);
-// adaptive_n_back_experiment.push(instructions_2_block);
+const right_arrow_redo = {
+  timeline: [right_arrow_feedback_node],
+  loop_function: function () {
+    const last_trial_correct = jsPsych.data.get().last(2).values()[0].correct;
+    if (last_trial_correct) {
+      return false;
+    }
+    return true;
+  },
+};
+adaptive_n_back_experiment.push(right_arrow_redo);
+adaptive_n_back_experiment.push(instructions_2_block);
 
 // practice block //
-// adaptive_n_back_experiment = adaptive_n_back_experiment.concat(getNbackPracticeTrials(1));
-// adaptive_n_back_experiment.push(update_progress_bar_block);
-// adaptive_n_back_experiment.push(instructions_3_block);
+adaptive_n_back_experiment = adaptive_n_back_experiment.concat(getNbackPracticeTrials(1));
+adaptive_n_back_experiment.push(update_progress_bar_block);
+adaptive_n_back_experiment.push(instructions_3_block);
 
 if (SHOW_CONTROL_TRIALS && control_before === 0) {
   adaptive_n_back_experiment.push(start_control_block);
