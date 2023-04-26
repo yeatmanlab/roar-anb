@@ -561,7 +561,7 @@ const welcome_screen_block = {
   choices: "ALL_KEYS",
   response_allowed_while_playing: true,
   prompt: `<div class = "background">
-  <img class = "lab-background-image" src="${welcome_screen_gif}"></img>  
+  <img class = "lab-background-image" style="height: 120%; " src="${welcome_screen_gif}"></img>  
   </div>
   <div class="press-key">Press <span class = "button-text">ANY KEY</span> to get started! </div>`,
 };
@@ -1456,7 +1456,6 @@ for (let b = 1; b <= NUM_BLOCKS; b++) {
         return (delay - previous_delay < 0);
       },
     };
-
 
     adaptive_n_back_experiment.push(if_level_up_node);
     adaptive_n_back_experiment.push(if_level_down_node);

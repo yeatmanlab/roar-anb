@@ -105,22 +105,27 @@ body {
 }
 
 .background {
-	width:100%;
-    height:auto;
+    height:100%;
+    width:100%;
 	position: fixed;
-	display: block;
     top: 20vh;
 	bottom: 5vh;
+    margin-left: 0;
+    margin-right: 0;
+    display: flex;
+    justify-content: center;
     filter: blur(1px);
+    background-attachment: fixed;
+    background-position: center;
+    z-index: -95;
 }
 
 .lab-background-image {
     top: -15vh;
-    height: 100vh;
-    width: audio;
+    width: 100%;
+    height: auto;
 	position: fixed;
 	display: block;
-	bottom: 1vh;
 }
 
 .bookleft {
