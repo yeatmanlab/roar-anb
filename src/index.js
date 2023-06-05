@@ -30,6 +30,7 @@ import {
   CORRECT_KEY_TEXT,
   WRONG_KEY_PRESS,
   WRONG_KEY_TEXT,
+  CASING_CHOICE,
 } from './utils';
 
 // ***** assets *****//
@@ -109,6 +110,7 @@ import end_game_audio from '../assets/end-game-audio.mp3';
 
 // ---------Initialize the jsPsych object and the timeline---------
 const config = await initConfig();
+console.log(config);
 const jsPsych = initRoarJsPsych(config);
 const timeline = initRoarTimeline(config);
 
@@ -120,6 +122,15 @@ let credit_let = true; // default to true
 
 // task specific variables
 const letters = 'bBdDgGtTvV'.split("");
+let letters = 'bBdDgGtTvV';
+if (CASING_CHOICE === 0) {
+  letters = letters.toLowerCase().split("");
+} else if (CASING_CHOICE === 1) {
+  letters = letters.toUpperCase().split("");
+} else {
+  letters = letters.split("");
+}
+
 const control_before = Math.round(Math.random()); // 0 control comes before test, 1, after
 let block_acc = 0; // record block accuracy to determine next blocks delay
 let delay = 1; // starting delay
@@ -134,8 +145,8 @@ let target = "";
 let curr_stim = '';
 let stims = []; // hold stims per block
 const blockConfig = {
-  adaptive: { trial_id: "stim", exp_stage: "adaptive" },
-  control: { trial_id: "stim", exp_stage: "control" },
+  adaptive: { trial_id: "stim", task: "test_response", pid: config.pid },
+  control: { trial_id: "stim", task: "control_response", pid: config.pid },
 };
 
 /* ************************************ */
@@ -225,9 +236,9 @@ const record_acc = (data) => {
     }
   }
   jsPsych.data.addDataToLastTrial({
-    correct: correct,
+    correct: (correct ? 1 : 0),
     stim: curr_stim,
-    trial_num: current_trial,
+    trialNumTotal: current_trial + 1,
   });
   current_trial += 1;
   block_trial += 1;
@@ -374,9 +385,10 @@ const adaptive_block = {
   stimulus: () => getStim(),
   data: () => ({
     ...blockConfig.adaptive,
-    load: delay,
+    save_trial: true,
+    nBack: delay,
     target: target,
-    block_num: current_block,
+    block_num: current_block + 1,
   }),
   choices: [CORRECT_KEY_PRESS, WRONG_KEY_PRESS],
   on_finish: (data) => {
@@ -412,7 +424,7 @@ for (let i = 0; i < CONTROL_NUM_TRIALS; i++) {
     stimulus: getStim,
     data: {
       ...blockConfig.control,
-      load: 0,
+      nBack: 0,
       save_trial: true,
       target: 't',
     },
@@ -445,7 +457,7 @@ const adaptive_block_visual_feedback = {
   trial_duration: 300,
   data: {
     trial_id: "stim",
-    exp_stage: "practice",
+    task: "practice_response",
     stim: getLatestStim() || null,
     target: target,
     save_trial: false,
@@ -952,7 +964,8 @@ function getNbackPracticeTrials() {
       stimulus: () => drawStim(stim, false),
       data: {
         trial_id: "stim",
-        exp_stage: "static_practice",
+        task: "practice_response",
+        pid: config.pid,
         stim: stim || null,
         stimIndex: i,
         save_trial: true,
@@ -984,7 +997,8 @@ function getNbackPracticeTrials() {
       trial_duration: 300,
       data: {
         trial_id: "stim",
-        exp_stage: "practice",
+        task: "practice_response",
+        pid: config.pid,
         stim: stim,
         save_trial: false,
       },
@@ -1311,7 +1325,6 @@ function getNbackInstructions() {
 const start_adaptive_block = {
   type: jsPsychHtmlKeyboardResponse,
   data: {
-    exp_stage: "adaptive",
     trial_id: "delay_text",
   },
   stimulus: () => `<div class = "centerbox"> <h1 class = "block-text"> Now, you're looking for matching letters between ${delay} screen${(delay === 1) ? "" : "s"}!</h1>  <p class = "block-text">You should press the <span class="right-arrow-blue">${CORRECT_KEY_TEXT}</span> when the current letter matches the letter that appeared ${delay} screen${(delay === 1) ? "" : "s"} before. Otherwise, press the <span class="left-arrow-red">${WRONG_KEY_TEXT}.</span></p>
