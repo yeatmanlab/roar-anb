@@ -121,7 +121,6 @@ const timeline = initRoarTimeline(config);
 let credit_let = true; // default to true
 
 // task specific variables
-const letters = 'bBdDgGtTvV'.split("");
 let letters = 'bBdDgGtTvV';
 if (CASING_CHOICE === 0) {
   letters = letters.toLowerCase().split("");
