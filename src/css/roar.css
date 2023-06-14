@@ -52,12 +52,14 @@ p  {
 }
 
 .consent_form_text{
-	margin: 10%;
+	margin: 3%;
 	text-align:left;
-	font-size: 2vh;
+	font-size: 1.7vh;
 }
 
 .survey_form_text{
+	font-family: "Source Sans Pro", Gotham, "Helvetica Neue", Helvetica, Arial, "sans-serif";
+	margin: 3%;
 	text-align: center;
 	font-size: 3vh;
 }
@@ -475,11 +477,59 @@ p  {
 	border-radius: 1vh;
 }
 
-.jspsych-survey-html-form{
-	position: fixed;
-	bottom: 20%;
+.jspsych-survey-html-form {
+	position: sticky;
 	left: 50%;
 	transform: translate(-50%, -50%);
+	color: rgba(255, 255, 255, 1);
+	background-color: rgba(76, 101, 139, 1);
+	border-color: darkgrey;
+	padding: 1vh 2vh;
+	margin: 4vh 1vh 1vh 1vh;
+	font-size: 3vh;
+	font-weight: bold;
+	font-family: "Source Sans Pro", Gotham, "Helvetica Neue", Helvetica, Arial, "sans-serif";
+	cursor: pointer;
+	line-height: 1.4;
+	text-align: center;
+	white-space: nowrap;
+	vertical-align: middle;
+	background-image: none;
+	border: 1vh solid transparent;
+	border-radius: 1vh;
 }
 
+h4 {
+	margin-top: 5%;
+	margin-right: 10%;
+	margin-left: 10%;
+	text-align: center;
+	padding-inline: 10px;
+	font-family: "Source Sans Pro", Gotham, "Helvetica Neue", Helvetica, Arial, "sans-serif";
+	font-weight: semi-bold;
+	font-size: 6vh;
+	color: rgba(76,101,139,1);
+}
+
+#jspsych-survey-multi-select-next {
+	position: sticky;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	color: rgba(255, 255, 255, 1);
+	background-color: rgba(76, 101, 139, 1);
+	border-color: darkgrey;
+	padding: 1vh 2vh;
+	margin: 4vh 1vh 1vh 1vh;
+	font-size: 3vh;
+	font-weight: bold;
+	font-family: "Source Sans Pro", Gotham, "Helvetica Neue", Helvetica, Arial, "sans-serif";
+	cursor: pointer;
+	line-height: 1.4;
+	text-align: center;
+	white-space: nowrap;
+	vertical-align: middle;
+	background-image: none;
+	border: 1vh solid transparent;
+	border-radius: 1vh;
+}
 

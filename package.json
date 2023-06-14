@@ -43,6 +43,8 @@
     "@jspsych/plugin-html-keyboard-response": "^1.1.2",
     "@jspsych/plugin-image-keyboard-response": "^1.1.2",
     "@jspsych/plugin-preload": "^1.1.2",
+    "@jspsych/plugin-survey-html-form": "^1.0.2",
+    "@jspsych/plugin-survey-multi-select": "^1.1.2",
     "@jspsych/plugin-survey-text": "^1.1.2",
     "@jspsych/plugin-video-keyboard-response": "^1.1.2",
     "babel-loader": "^8.2.5",

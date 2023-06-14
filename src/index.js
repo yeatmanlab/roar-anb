@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 // jsPsych imports
 import jsPsychFullScreen from '@jspsych/plugin-fullscreen';
 import jsPsychPreload from '@jspsych/plugin-preload';
@@ -18,19 +19,7 @@ import './css/roar.css';
 import './css/custom.css';
 
 // Local modules
-import { initConfig, initRoarJsPsych, initRoarTimeline } from './config';
-import {
-  NUM_BLOCKS,
-  ADAPTIVE_NUM_TRIALS,
-  CONTROL_NUM_TRIALS,
-  SHOW_CONTROL_TRIALS,
-  STIMULUS_FONT_SIZE,
-  IGNORE_CASE,
-  CORRECT_KEY_PRESS,
-  CORRECT_KEY_TEXT,
-  WRONG_KEY_PRESS,
-  WRONG_KEY_TEXT,
-} from './utils';
+import { config, jsPsych, timeline } from './config';
 
 // ***** assets *****//
 // images and gifs //
@@ -107,11 +96,6 @@ import level_up_audio from '../assets/level-up-see-new-instructions.mp3';
 import level_down_audio from '../assets/level-down.mp3';
 import end_game_audio from '../assets/end-game-audio.mp3';
 
-// ---------Initialize the jsPsych object and the timeline---------
-const config = await initConfig();
-const jsPsych = initRoarJsPsych(config);
-const timeline = initRoarTimeline(config);
-
 /* ************************************ */
 /* Define experimental variables */
 /* ************************************ */
@@ -119,7 +103,15 @@ const timeline = initRoarTimeline(config);
 let credit_let = true; // default to true
 
 // task specific variables
-const letters = 'bBdDgGtTvV'.split("");
+let letters = 'bBdDgGtTvV';
+if (config.utils.CASING_CHOICE === 0) {
+  letters = letters.toLowerCase().split("");
+} else if (config.utils.CASING_CHOICE === 1) {
+  letters = letters.toUpperCase().split("");
+} else {
+  letters = letters.split("");
+}
+
 const control_before = Math.round(Math.random()); // 0 control comes before test, 1, after
 let block_acc = 0; // record block accuracy to determine next blocks delay
 let delay = 1; // starting delay
@@ -134,8 +126,8 @@ let target = "";
 let curr_stim = '';
 let stims = []; // hold stims per block
 const blockConfig = {
-  adaptive: { trial_id: "stim", exp_stage: "adaptive" },
-  control: { trial_id: "stim", exp_stage: "control" },
+  adaptive: { trial_id: "stim", task: "test_response", pid: config.pid },
+  control: { trial_id: "stim", task: "control_response", pid: config.pid },
 };
 
 /* ************************************ */
@@ -143,7 +135,8 @@ const blockConfig = {
 /* ************************************ */
 const updateProgressBar = () => {
   // additional blocks for practice and control
-  const total_blocks = NUM_BLOCKS + 1 + Number(SHOW_CONTROL_TRIALS);
+  // eslint-disable-next-line max-len
+  const total_blocks = config.utils.NUM_BLOCKS + 1 + Number(config.utils.SHOW_CONTROL_TRIALS);
   const curr_progress_bar_value = jsPsych.getProgressBarCompleted();
   jsPsych.setProgressBar(curr_progress_bar_value + 1 / total_blocks);
 };
@@ -206,35 +199,37 @@ const randomDraw = (lst) => {
 const record_acc = (data) => {
   let stim_lower = curr_stim;
   let target_lower = data.target;
-  if (IGNORE_CASE) {
+  if (config.utils.IGNORE_CASE) {
     stim_lower = curr_stim.toLowerCase();
     target_lower = data.target.toLowerCase();
   }
 
   const key = data.response;
   let correct = false;
-  if (stim_lower === target_lower && jsPsych.pluginAPI.compareKeys(key, CORRECT_KEY_PRESS)) {
+  // eslint-disable-next-line max-len
+  if (stim_lower === target_lower && jsPsych.pluginAPI.compareKeys(key, config.utils.CORRECT_KEY_PRESS)) {
     correct = true;
     if (block_trial >= delay) {
       block_acc += 1;
     }
-  } else if (stim_lower !== target_lower && jsPsych.pluginAPI.compareKeys(key, WRONG_KEY_PRESS)) {
+  // eslint-disable-next-line max-len
+  } else if (stim_lower !== target_lower && jsPsych.pluginAPI.compareKeys(key, config.utils.WRONG_KEY_PRESS)) {
     correct = true;
     if (block_trial >= delay) {
       block_acc += 1;
     }
   }
   jsPsych.data.addDataToLastTrial({
-    correct: correct,
+    correct: (correct ? 1 : 0),
     stim: curr_stim,
-    trial_num: current_trial,
+    trialNumTotal: current_trial + 1,
   });
   current_trial += 1;
   block_trial += 1;
 };
 
 const update_delay = () => {
-  const mistakes = ADAPTIVE_NUM_TRIALS - block_acc;
+  const mistakes = config.utils.ADAPTIVE_NUM_TRIALS - block_acc;
   previous_delay = delay;
   if (delay >= 2) {
     // TODO: think about how to make this number relate to total ADAPTIVE_NUM_TRIALS
@@ -272,7 +267,7 @@ function drawStim(stim, feedback) {
   return ` <div class = "topcenter">
   <p class="delayprompt"> ${delay_prompt_text} </p> </div>
   <div class = "centerbox"><div class="center-text stimulus-circle"> 
-    <p style="font-size: ${STIMULUS_FONT_SIZE}px" class="stimulus-stext">${stim}</p>
+    <p style="font-size: ${config.utils.STIMULUS_FONT_SIZE}px" class="stimulus-stext">${stim}</p>
     <div class="arrow-div">
     <div class="right-arrow-div" id="${(jsPsych.pluginAPI.compareKeys(direction, "ArrowRight") && (feedback)) ? "arrow-bg-color" : ''}">
       <img src="${right_arrow_image}" class="right-arrow"></img>
@@ -287,13 +282,13 @@ function drawStim(stim, feedback) {
 const getStim = () => {
   const trial_type = target_trials.shift();
   const targets = letters.filter((x) => {
-    if (IGNORE_CASE) {
+    if (config.utils.IGNORE_CASE) {
       return x.toLowerCase() === target.toLowerCase();
     }
     return x === target;
   });
   const non_targets = letters.filter((x) => {
-    if (IGNORE_CASE) {
+    if (config.utils.IGNORE_CASE) {
       return x.toLowerCase() !== target.toLowerCase();
     }
     return x !== target;
@@ -357,14 +352,14 @@ const update_target_block = {
 
 const start_control_block = {
   type: jsPsychHtmlKeyboardResponse,
-  stimulus: `<div class = "centerbox"><h1 class = "block-text">In this block you do not have to match letters to previous letters.</h1><p class = "block-text"> Instead, press the <span class="right-arrow-blue">${CORRECT_KEY_TEXT}</span> everytime you see a "t" or "T" and the <span class="left-arrow-red">${WRONG_KEY_TEXT}</span> for all other letters.</p><p class = center-block-text>Press <strong>the space bar</strong> to begin.</p></div>
+  stimulus: `<div class = "centerbox"><h1 class = "block-text">In this block you do not have to match letters to previous letters.</h1><p class = "block-text"> Instead, press the <span class="right-arrow-blue">${config.utils.CORRECT_KEY_TEXT}</span> everytime you see a "t" or "T" and the <span class="left-arrow-red">${config.utils.WRONG_KEY_TEXT}</span> for all other letters.</p><p class = center-block-text>Press <strong>the space bar</strong> to begin.</p></div>
   <div class="press-key">Press the<span class ="button-text"> SPACE BAR</span> to continue. </div>`,
   choices: [" "],
   data: {
     trial_id: "instruction",
   },
   on_finish: () => {
-    target_trials = jsPsych.randomization.repeat(['target', '0', '0'], Math.round(CONTROL_NUM_TRIALS / 3)).slice(0, CONTROL_NUM_TRIALS);
+    target_trials = jsPsych.randomization.repeat(['target', '0', '0'], Math.round(config.utils.CONTROL_NUM_TRIALS / 3)).slice(0, config.utils.CONTROL_NUM_TRIALS);
     target = 't';
   },
 };
@@ -374,11 +369,12 @@ const adaptive_block = {
   stimulus: () => getStim(),
   data: () => ({
     ...blockConfig.adaptive,
-    load: delay,
+    save_trial: true,
+    nBack: delay,
     target: target,
-    block_num: current_block,
+    block_num: current_block + 1,
   }),
-  choices: [CORRECT_KEY_PRESS, WRONG_KEY_PRESS],
+  choices: [config.utils.CORRECT_KEY_PRESS, config.utils.WRONG_KEY_PRESS],
   on_finish: (data) => {
     record_acc(data);
   },
@@ -405,31 +401,33 @@ const feedback_trial = {
 
 // Define control (0-back) block
 const control_trials = [];
-for (let i = 0; i < CONTROL_NUM_TRIALS; i++) {
+for (let i = 0; i < config.utils.CONTROL_NUM_TRIALS; i++) {
   const control_block = {
     type: jsPsychHtmlKeyboardResponse,
     is_html: true,
     stimulus: getStim,
     data: {
       ...blockConfig.control,
-      load: 0,
+      nBack: 0,
       save_trial: true,
       target: 't',
     },
-    choices: [CORRECT_KEY_PRESS, WRONG_KEY_PRESS],
+    choices: [config.utils.CORRECT_KEY_PRESS, config.utils.WRONG_KEY_PRESS],
     on_finish: (data) => {
       record_acc(data);
       // Score the response as correct or incorrect.
       const stim = stims.slice(-1)[0];
       let matching_response = stim === 't';
-      if (IGNORE_CASE) {
+      if (config.utils.IGNORE_CASE) {
         matching_response = stim.toLowerCase() === 't';
       }
 
       if (matching_response) {
-        data.correct = jsPsych.pluginAPI.compareKeys(data.response, CORRECT_KEY_PRESS);
+        // eslint-disable-next-line max-len
+        data.correct = jsPsych.pluginAPI.compareKeys(data.response, config.utils.CORRECT_KEY_PRESS);
       } else {
-        data.correct = jsPsych.pluginAPI.compareKeys(data.response, WRONG_KEY_PRESS);
+        // eslint-disable-next-line max-len
+        data.correct = jsPsych.pluginAPI.compareKeys(data.response, config.utils.WRONG_KEY_PRESS);
       }
     },
   };
@@ -445,7 +443,7 @@ const adaptive_block_visual_feedback = {
   trial_duration: 300,
   data: {
     trial_id: "stim",
-    exp_stage: "practice",
+    task: "practice_response",
     stim: getLatestStim() || null,
     target: target,
     save_trial: false,
@@ -648,7 +646,7 @@ const instructions_1_block = {
   response_allowed_while_playing: true,
   choices: "ALL_KEYS",
   on_finish: (data) => {
-    data.correct = jsPsych.pluginAPI.compareKeys(data.response, CORRECT_KEY_PRESS);
+    data.correct = jsPsych.pluginAPI.compareKeys(data.response, config.utils.CORRECT_KEY_PRESS);
   },
   prompt: `<div class = "background">
   <img class = "lab-background-image" src="${lab_background_image}"></img>  
@@ -677,7 +675,7 @@ const right_arrow_feedback_node = {
   },
   choices: "ALL_KEYS",
   on_finish: (data) => {
-    data.correct = jsPsych.pluginAPI.compareKeys(data.response, CORRECT_KEY_PRESS);
+    data.correct = jsPsych.pluginAPI.compareKeys(data.response, config.utils.CORRECT_KEY_PRESS);
   },
   prompt: () => {
     // checking if the last trial was correct to push appropriate feedback prompt
@@ -746,26 +744,29 @@ function getCommonOneBackProperties(idx) {
       if (data.correct) {
         return [data.response];
       }
-      const response_is_correct_key_press = jsPsych.pluginAPI.compareKeys(
-        data.response, CORRECT_KEY_PRESS);
-      return [response_is_correct_key_press ? WRONG_KEY_PRESS : CORRECT_KEY_PRESS];
+      const response_is_correct_key_press = jsPsych.pluginAPI.compareKeys(data.response, config.utils.CORRECT_KEY_PRESS);
+      // eslint-disable-next-line max-len
+      return [response_is_correct_key_press ? config.utils.WRONG_KEY_PRESS : config.utils.CORRECT_KEY_PRESS];
     },
     response_allowed_while_playing: true,
     prompt: () => {
       const data = jsPsych.data.get().last(3).values()[0];
-      const is_right_arrow = (jsPsych.pluginAPI.compareKeys(data.response, CORRECT_KEY_PRESS));
+      // eslint-disable-next-line max-len
+      const is_right_arrow = (jsPsych.pluginAPI.compareKeys(data.response, config.utils.CORRECT_KEY_PRESS));
       let correct_practice_trial_response;
       if (data.correct) {
-        correct_practice_trial_response = is_right_arrow ? CORRECT_KEY_PRESS : WRONG_KEY_PRESS;
+        // eslint-disable-next-line max-len
+        correct_practice_trial_response = is_right_arrow ? config.utils.CORRECT_KEY_PRESS : config.utils.WRONG_KEY_PRESS;
       } else {
-        correct_practice_trial_response = is_right_arrow ? WRONG_KEY_PRESS : CORRECT_KEY_PRESS;
+        // eslint-disable-next-line max-len
+        correct_practice_trial_response = is_right_arrow ? config.utils.WRONG_KEY_PRESS : config.utils.CORRECT_KEY_PRESS;
       }
       return `<div class = "background">
       <img class = "lab-background-image" src="${lab_background_image}"></img>  
       </div>
       <div class="row">
         <div class="column_1">
-          <img class="catleft" src="${(correct_practice_trial_response === CORRECT_KEY_PRESS) ? cat_right_arrow_flash_gif : cat_left_arrow_flash_gif}"></img>
+          <img class="catleft" src="${(correct_practice_trial_response === config.utils.CORRECT_KEY_PRESS) ? cat_right_arrow_flash_gif : cat_left_arrow_flash_gif}"></img>
           </div>
         <div class="text-box">
           <p class="middle"> <strong> Remember, press the <span class="right-arrow-blue">RIGHT arrow key when the letters match</span> and the <span class="left-arrow-red">LEFT arrow key when the letters do not match</span>.</strong> <br/> <br/> We're practicing to recognize matching letters ${(delay === 1) ? "back to back" : "with the one 2 screens ago"}. <br/> <br/> That means you were comparing ${staticStims[idx]} and ${staticStims[idx - delay]}. You hit the ${is_right_arrow ? "right" : "left"} arrow key which is for ${is_right_arrow ? "match" : "not a match"}. <br/> <br/> ${staticStims[idx]} and ${staticStims[idx - delay]} ${(staticStims[idx] === staticStims[idx - delay]) ? "do" : "do not"} match, so that's ${data.correct ? "correct!" : "incorrect."} We'd press the ${(staticStims[idx] === staticStims[idx - delay]) ? "RIGHT arrow" : "LEFT arrow"} key. </p>
@@ -784,26 +785,28 @@ function getCommonTwoBackProperties(idx) {
       if (data.correct) {
         return [data.response];
       }
-      const response_is_correct_key_press = jsPsych.pluginAPI.compareKeys(
-        data.response, CORRECT_KEY_PRESS);
-      return [response_is_correct_key_press ? WRONG_KEY_PRESS : CORRECT_KEY_PRESS];
+      const response_is_correct_key_press = jsPsych.pluginAPI.compareKeys(data.response, config.utils.CORRECT_KEY_PRESS);
+      // eslint-disable-next-line max-len
+      return [response_is_correct_key_press ? config.utils.WRONG_KEY_PRESS : config.utils.CORRECT_KEY_PRESS];
     },
     response_allowed_while_playing: true,
     prompt: () => {
       const data = jsPsych.data.get().last(3).values()[0];
-      const is_right_arrow = (jsPsych.pluginAPI.compareKeys(data.response, CORRECT_KEY_PRESS));
+      // eslint-disable-next-line max-len
+      const is_right_arrow = (jsPsych.pluginAPI.compareKeys(data.response, config.utils.CORRECT_KEY_PRESS));
       let correct_practice_trial_response;
       if (data.correct) {
-        correct_practice_trial_response = is_right_arrow ? CORRECT_KEY_PRESS : WRONG_KEY_PRESS;
+        // eslint-disable-next-line max-len
+        correct_practice_trial_response = is_right_arrow ? config.utils.CORRECT_KEY_PRESS : config.utils.WRONG_KEY_PRESS;
       } else {
-        correct_practice_trial_response = is_right_arrow ? WRONG_KEY_PRESS : CORRECT_KEY_PRESS;
+        correct_practice_trial_response = is_right_arrow ? config.utils.WRONG_KEY_PRESS : config.utils.CORRECT_KEY_PRESS;
       }
       return `<div class = "background">
       <img class = "lab-background-image" src="${lab_background_image}"></img>  
       </div>
       <div class="row">
         <div class="column_1">
-          <img class="catleft" src="${(correct_practice_trial_response === CORRECT_KEY_PRESS) ? cat_right_arrow_flash_gif : cat_left_arrow_flash_gif}"></img>
+          <img class="catleft" src="${(correct_practice_trial_response === config.utils.CORRECT_KEY_PRESS) ? cat_right_arrow_flash_gif : cat_left_arrow_flash_gif}"></img>
           </div>
         <div class="text-box">
           <p class="middle"> <strong> Remember, press the <span class="right-arrow-blue">RIGHT arrow key when the letters match</span> and the <span class="left-arrow-red">LEFT arrow key when the letters do not match</span>.</strong> <br/> <br/> We're practicing to recognize matching letters with the one 2 screens ago. <br/> <br/> Our last screens were ${staticStims[idx]}, ${staticStims[idx - 1]}, and ${staticStims[idx - 2]}. That means you were comparing ${staticStims[idx]} and ${staticStims[idx - delay]}. You hit the ${is_right_arrow ? "right" : "left"} arrow key which is for ${is_right_arrow ? "match" : "not a match"}. <br/> <br/> ${staticStims[idx]} and ${staticStims[idx - delay]} ${(staticStims[idx] === staticStims[idx - delay]) ? "do" : "do not"} match, so that's ${data.correct ? "correct!" : "incorrect."} We'd press the ${(staticStims[idx] === staticStims[idx - delay]) ? "RIGHT arrow" : "LEFT arrow"} key. </p>
@@ -833,11 +836,11 @@ const two_back_feedback_audios = [
 function practiceFirstStimFeedback() {
   return {
     type: jsPsychAudioKeyboardResponse,
-    choices: [WRONG_KEY_PRESS],
+    choices: [config.utils.WRONG_KEY_PRESS],
     response_allowed_while_playing: true,
     prompt: () => {
       const data = jsPsych.data.get().last(3).values()[0];
-      const is_right_arrow = (jsPsych.pluginAPI.compareKeys(data.response, CORRECT_KEY_PRESS));
+      const is_right_arrow = (jsPsych.pluginAPI.compareKeys(data.response, config.utils.CORRECT_KEY_PRESS));
       return `<div class = "background">
     <img class = "lab-background-image" src="${lab_background_image}"></img>  
     </div>
@@ -857,11 +860,11 @@ function practiceFirstStimFeedback() {
 function practice2BackSecondStimFeedback() {
   return {
     type: jsPsychAudioKeyboardResponse,
-    choices: [WRONG_KEY_PRESS],
+    choices: [config.utils.WRONG_KEY_PRESS],
     response_allowed_while_playing: true,
     prompt: () => {
       const data = jsPsych.data.get().last(3).values()[0];
-      const is_right_arrow = (jsPsych.pluginAPI.compareKeys(data.response, CORRECT_KEY_PRESS));
+      const is_right_arrow = (jsPsych.pluginAPI.compareKeys(data.response, config.utils.CORRECT_KEY_PRESS));
       return `<div class = "background">
     <img class = "lab-background-image" src="${lab_background_image}"></img>  
     </div>
@@ -952,26 +955,27 @@ function getNbackPracticeTrials() {
       stimulus: () => drawStim(stim, false),
       data: {
         trial_id: "stim",
-        exp_stage: "static_practice",
+        task: "practice_response",
+        pid: config.pid,
         stim: stim || null,
         stimIndex: i,
         save_trial: true,
       },
-      choices: [CORRECT_KEY_PRESS, WRONG_KEY_PRESS],
+      choices: [config.utils.CORRECT_KEY_PRESS, config.utils.WRONG_KEY_PRESS],
       on_finish: (data) => {
         if (data.stimIndex >= delay) {
           data.target = staticStims[data.stimIndex - delay];
         }
         // Score the response as correct or incorrect.
         let matching_response = data.stim === data.target;
-        if (IGNORE_CASE === true) {
+        if (config.utils.IGNORE_CASE === true) {
           matching_response = data.stim.toLowerCase() === data.target?.toLowerCase();
         }
 
         if (matching_response) {
-          data.correct = jsPsych.pluginAPI.compareKeys(data.response, CORRECT_KEY_PRESS);
+          data.correct = jsPsych.pluginAPI.compareKeys(data.response, config.utils.CORRECT_KEY_PRESS);
         } else {
-          data.correct = jsPsych.pluginAPI.compareKeys(data.response, WRONG_KEY_PRESS);
+          data.correct = jsPsych.pluginAPI.compareKeys(data.response, config.utils.WRONG_KEY_PRESS);
         }
       },
     };
@@ -984,7 +988,8 @@ function getNbackPracticeTrials() {
       trial_duration: 300,
       data: {
         trial_id: "stim",
-        exp_stage: "practice",
+        task: "practice_response",
+        pid: config.pid,
         stim: stim,
         save_trial: false,
       },
@@ -1311,10 +1316,9 @@ function getNbackInstructions() {
 const start_adaptive_block = {
   type: jsPsychHtmlKeyboardResponse,
   data: {
-    exp_stage: "adaptive",
     trial_id: "delay_text",
   },
-  stimulus: () => `<div class = "centerbox"> <h1 class = "block-text"> Now, you're looking for matching letters between ${delay} screen${(delay === 1) ? "" : "s"}!</h1>  <p class = "block-text">You should press the <span class="right-arrow-blue">${CORRECT_KEY_TEXT}</span> when the current letter matches the letter that appeared ${delay} screen${(delay === 1) ? "" : "s"} before. Otherwise, press the <span class="left-arrow-red">${WRONG_KEY_TEXT}.</span></p>
+  stimulus: () => `<div class = "centerbox"> <h1 class = "block-text"> Now, you're looking for matching letters between ${delay} screen${(delay === 1) ? "" : "s"}!</h1>  <p class = "block-text">You should press the <span class="right-arrow-blue">${config.utils.CORRECT_KEY_TEXT}</span> when the current letter matches the letter that appeared ${delay} screen${(delay === 1) ? "" : "s"} before. Otherwise, press the <span class="left-arrow-red">${config.utils.WRONG_KEY_TEXT}.</span></p>
   <div><p class = "block-text"><strong>${(delay <= 3) ? "Press Y if you'd like to listen to the instructions again." : ""}</strong> </p></div>, 
   <div class="press-key">Press the<span class ="button-text"> SPACE BAR</span> to begin the next round.</div>`,
   choices: [" ", "y", "n", "Y", "N"],
@@ -1324,14 +1328,14 @@ const start_adaptive_block = {
 
     // adaptive trials have 'delay' more trials
     // for instance, if delay = 2, number of trials = ADAPTIVE_NUM_TRIALS + 2
-    trials_left = ADAPTIVE_NUM_TRIALS + delay;
+    trials_left = config.utils.ADAPTIVE_NUM_TRIALS + delay;
     target_trials = [];
     for (let i = 0; i < delay; i++) {
       target_trials.push('0');
     }
     let trials_to_add = [];
     for (let j = 0; j < (trials_left - delay); j++) {
-      if (j < (Math.round(ADAPTIVE_NUM_TRIALS / 3))) {
+      if (j < (Math.round(config.utils.ADAPTIVE_NUM_TRIALS / 3))) {
         trials_to_add.push('target');
       } else {
         trials_to_add.push('0');
@@ -1421,24 +1425,24 @@ const right_arrow_redo = {
 adaptive_n_back_experiment.push(right_arrow_redo);
 adaptive_n_back_experiment.push(instructions_2_block);
 
-// practice block //
+// practice block for one back //
 adaptive_n_back_experiment = adaptive_n_back_experiment.concat(getNbackPracticeTrials(1));
 adaptive_n_back_experiment.push(update_progress_bar_block);
 adaptive_n_back_experiment.push(instructions_3_block);
 
-if (SHOW_CONTROL_TRIALS && control_before === 0) {
+if (config.utils.SHOW_CONTROL_TRIALS && control_before === 0) {
   adaptive_n_back_experiment.push(start_control_block);
   adaptive_n_back_experiment = adaptive_n_back_experiment.concat(control_trials);
   adaptive_n_back_experiment.push(update_progress_bar_block);
   adaptive_n_back_experiment.push(generic_game_break_block);
 }
 
-for (let b = 1; b <= NUM_BLOCKS; b++) {
+for (let b = 1; b <= config.utils.NUM_BLOCKS; b++) {
   adaptive_n_back_experiment.push(instructions_loop);
   adaptive_n_back_experiment.push(adaptive_test_node);
   adaptive_n_back_experiment.push(update_delay_block);
 
-  if (b < NUM_BLOCKS) {
+  if (b < config.utils.NUM_BLOCKS) {
     const grab_game_break_node = {
       timeline: [(b >= game_break_blocks.length) ? generic_game_break_block : game_break_blocks[b]],
     };
@@ -1451,10 +1455,7 @@ for (let b = 1; b <= NUM_BLOCKS; b++) {
 
     const if_level_down_node = {
       timeline: [level_down_block],
-      conditional_function: () => {
-        console.log('delay', delay, 'previous delay', previous_delay);
-        return (delay - previous_delay < 0);
-      },
+      conditional_function: () => (delay - previous_delay < 0),
     };
 
     adaptive_n_back_experiment.push(if_level_up_node);
@@ -1479,7 +1480,7 @@ for (let b = 1; b <= NUM_BLOCKS; b++) {
   adaptive_n_back_experiment.push(if_delay_back_shown);
 }
 
-if (SHOW_CONTROL_TRIALS && control_before === 1) {
+if (config.utils.SHOW_CONTROL_TRIALS && control_before === 1) {
   // do not show game break for last adaptive block, so we must show it before the control block
   adaptive_n_back_experiment.push(generic_game_break_block);
   adaptive_n_back_experiment.push(start_control_block);
