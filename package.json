@@ -5,15 +5,13 @@
   "author": "Shoaib Mohammed <shoaib98libra@gmail.com>",
   "private": true,
   "scripts": {
-    "lint": "eslint --ext .js,.ts .",
-    "format": "eslint . --ext .js,.ts --fix",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npx webpack --mode production",
-    "build:dev": "npm run build -- --env dbmode=development",
-    "build:prod": "npm run build -- --env dbmode=production",
-    "start": "npx webpack serve --open --mode development",
-    "start:dev": "npm run start -- --env dbmode=development",
-    "start:prod": "npm run start -- --env dbmode=production"
+    "build:dev": "npx webpack --mode production --env dbmode=development",
+    "build:prod": "npx webpack --mode production --env dbmode=production",
+    "build:package": "npx rollup -c",
+    "prepublishOnly": "npm run build:package",
+    "serve:dev": "npx webpack serve --open --mode development --env dbmode=development",
+    "serve:prod": "npx webpack serve --open --mode development --env dbmode=production"
   },
   "repository": {
     "type": "git",

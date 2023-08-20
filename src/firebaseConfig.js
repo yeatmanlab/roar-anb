@@ -1,4 +1,4 @@
-import { log } from './logger';
+import { log } from './experiment/config/logger';
 
 // eslint-disable-next-line no-undef
 const rootDoc = ROAR_DB_DOC === "production" ? ["prod", "roar-prod"] : ["dev", "roar-anb"];

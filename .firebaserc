@@ -1,14 +1,18 @@
 {
   "projects": {
-    "default": "gse-yeatmanlab"
+    "default": "gse-roar-assessment"
   },
   "targets": {
-    "gse-yeatmanlab": {
+    "gse-roar-assessment": {
       "hosting": {
-        "roar-anb": [
+        "anb": [
           "roar-anb"
+        ],
+        "anbtest": [
+          "roar-anb-testing"
         ]
       }
     }
-  }
+  },
+  "etags": {}
 }
