@@ -7,7 +7,6 @@ import 'regenerator-runtime/runtime';
 import { initConfig } from "./experiment/config/config";
 import { buildExperiment } from "./experiment/experiment";
 import "./experiment/css/roar.css";
-import './experiment/css/custom.css';
 import { waitFor } from "./experiment/experimentHelpers";
 
 class RoarANB {

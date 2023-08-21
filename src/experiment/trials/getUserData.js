@@ -2,14 +2,14 @@
 import jsPsychSurveyText from '@jspsych/plugin-survey-text';
 import jsPsychSurveyMultiSelect from "@jspsych/plugin-survey-multi-select";
 import jsPsychSurveyHtmlForm from "@jspsych/plugin-survey-html-form";
-import jsPsychAudioKeyboardResponse from "@jspsych/plugin-audio-keyboard-response";
+import jsPsychHtmlKeyboardResponse from '@jspsych/plugin-html-keyboard-response';
 
 import store from 'store2';
 import i18next from 'i18next';
-import intro_1_audio from '../../../assets/intro-1.mp3';
 import { enterFullscreen } from './fullScreen';
 // import { mediaAssets } from '../experiment';
 import '../i18n';
+import { mediaAssets } from '../experiment';
 
 const getLabId = {
   type: jsPsychSurveyText,
@@ -207,17 +207,15 @@ const ifSurvey = {
 /* conditional trial that asks students to press a key to determine TOSREC stimuli
   - grade_select defines the trial and if_grade_select is a conditional
   timeline that will only appear if there is no grade meta_data from the dashboard */
-//        <img width="50%" src="${mediaAssets.images.gradeKeyboard}" alt="grade keys">
 
 const gradeSelect = {
-  type: jsPsychAudioKeyboardResponse,
-  stimulus: () => intro_1_audio,
-  prompt: () => (`
+  type: jsPsychHtmlKeyboardResponse,
+  stimulus: () => (`
       <div class="jspsych-content-modified" id="sre-background">
         <h3>${i18next.t('introduction.gradeSelect.text1')}</h3>
         <p>${i18next.t('introduction.gradeSelect.text2')}</p>
         <p>${i18next.t('introduction.gradeSelect.text3')}</p>
-
+        <img width="50%" src="${mediaAssets.images.gradeKeyboard}" alt="grade keys">
         <div class="button">${i18next.t('introduction.gradeSelect.text4')}</div>
       </div>`
   ),

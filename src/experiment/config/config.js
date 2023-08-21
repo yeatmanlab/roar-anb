@@ -119,7 +119,6 @@ export const initConfig = async (firekit, gameParams, userParams) => {
   };
 
   const updatedGameParams = Object.fromEntries(Object.entries(gameParams).map(([key, value]) => [key, config[key] ?? value]));
-  console.log(config)
   await config.firekit.updateTaskParams(updatedGameParams);
 
   if (config.pid !== null) {
@@ -199,7 +198,6 @@ export const initRoarJsPsych = (config) => {
     } = e;
 
     config.firekit?.writeTrial({
-      assessment_stage: 'error',
       lastTrial: jsPsych.data.getLastTrialData().trials[0],
       message: String(msg),
       source: url || null,

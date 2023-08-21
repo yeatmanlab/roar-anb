@@ -1,14 +1,13 @@
 /* eslint-disable import/prefer-default-export */
 /* eslint-disable import/no-mutable-exports */
 import { generateAssetObject, createPreloadTrials } from "@bdelab/roar-utils";
-import { preloadAudio } from 'roar-utils';
 import { jsPsych } from './jsPsych';
 import { initRoarJsPsych, initRoarTimeline } from "./config/config";
 import assets from '../../assets.json';
 // Import necessary for async in the top level of the experiment script
 import 'regenerator-runtime/runtime';
 import {
-  preload_audio, preload_images, welcome_screen_block,
+  welcome_screen_block,
   intro_1_block, intro_2_block, intro_3_block, intro_4_block,
   instructions_1_block, right_arrow_redo, instructions_2_block,
   getNbackPracticeTrials, update_progress_bar_block, instructions_3_block,
@@ -20,29 +19,24 @@ import {
 
 import './css/roar.css';
 
-// export let mediaAssets;
-// export let preloadTrials;
+export let mediaAssets;
+export let preloadTrials;
 const control_before = Math.round(Math.random()); // 0 control comes before test, 1, after
 const delay = 1; // starting delay
 const previous_delay = -1;
 
 export function buildExperiment(config) {
-  // const bucketURI = 'https://storage.googleapis.com/roar-anb';
+  const bucketURI = 'https://storage.googleapis.com/roar-anb';
 
-  // mediaAssets = generateAssetObject(assets, bucketURI);
-  // preloadTrials = createPreloadTrials(assets, bucketURI).default;
+  mediaAssets = generateAssetObject(assets, bucketURI);
+  preloadTrials = createPreloadTrials(assets, bucketURI).default;
+  console.log(mediaAssets)
 
   initRoarJsPsych(config);
   const initialTimeline = initRoarTimeline(config);
-  // let timeline = [preloadTrials, ...initialTimeline.timeline];
-  let timeline = [];
+  let timeline = [preloadTrials, ...initialTimeline.timeline];
 
   const pushTrialsToTimeline = () => {
-    // preload assets
-    // timeline.push(preload_audio);
-    // timeline.push(preloadAudio);
-    timeline.push(preload_images);
-
     // intro trials
     timeline.push(welcome_screen_block);
     timeline.push(intro_1_block);
