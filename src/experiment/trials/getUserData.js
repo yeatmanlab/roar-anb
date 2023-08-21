@@ -7,9 +7,8 @@ import jsPsychHtmlKeyboardResponse from '@jspsych/plugin-html-keyboard-response'
 import store from 'store2';
 import i18next from 'i18next';
 import { enterFullscreen } from './fullScreen';
-// import { mediaAssets } from '../experiment';
 import '../i18n';
-import { mediaAssets } from '../experiment';
+import { mediaAssets } from '../experimentHelpers';
 
 const getLabId = {
   type: jsPsychSurveyText,

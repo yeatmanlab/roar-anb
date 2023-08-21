@@ -7,15 +7,25 @@ import assets from '../../assets.json';
 // Import necessary for async in the top level of the experiment script
 import 'regenerator-runtime/runtime';
 import {
-  welcome_screen_block,
-  intro_1_block, intro_2_block, intro_3_block, intro_4_block,
-  instructions_1_block, right_arrow_redo, instructions_2_block,
-  getNbackPracticeTrials, update_progress_bar_block, instructions_3_block,
-  start_control_block, control_trials, generic_game_break_block,
+  getNbackPracticeTrials, update_progress_bar_block,
+  start_control_block, control_trials,
   instructions_loop, adaptive_test_node, update_delay_block,
-  game_break_blocks, getNbackInstructions, end_game_block, post_task_block,
-  level_up_block, level_down_block, exit_fullscreen, instructions,
+  getNbackInstructions, end_game_block, post_task_block,
+  exit_fullscreen, instructions,
 } from "./experimentHelpers";
+
+import {
+  welcome_screen_block, intro_1_block,
+  intro_2_block, intro_3_block, intro_4_block,
+} from "./trials/introduction";
+
+import {
+  instructions_1_block, right_arrow_redo, instructions_2_block, instructions_3_block,
+} from "./trials/instructions";
+
+import {
+  generic_game_break_block, game_break_blocks, level_up_block, level_down_block,
+} from "./trials/gameBreak";
 
 import './css/roar.css';
 

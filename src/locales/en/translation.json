@@ -19,70 +19,105 @@
       "text3": "For example, you would press “4” if you are in 4th grade.",
       "text4": "Press <span class='yellow'>the number key </span> of the grade you are in to continue "
     }, 
-    "intro": {
-      "text1": "Welcome to the Sentence Reading Efficiency activity!",
-      "text2": "In this activity, you are going to decide if a sentence is true or not.",
-      "text3": "Some of the sentences may be confusing, but do your best to label as many as you can.",
-      "text4": "Welcome! You are the new professor at Sentencia Academy.",
-      "text5": "We have some bright students that need your help with their sentence reading homework.",
-      "text6": "You will help these students decide if a sentence is true or not."
+    "welcome_screen_block": {
+      "text1": "Press <span class='button-text'>ANY KEY</span> to get started! "
+    }, 
+    "intro_1_block": {
+      "text1": " Hi Friend! My name is Dr. Woofus and I'm Stanford's only dog scientist. Today we built our very first robot, but something doesn't look quite right. <br/> <br/> This is what the instruction book says he's <i> supposed </i> to look like.",
+      "text2": "Press <span class='button-text'>ANY KEY</span> to see what we're working with! "
+    }, 
+    "intro_2_block": {
+      "text1": "See what I mean? Somehow his arms and legs ended up all twisted. <br/> <br/> We need your help figuring out where we went wrong. I think it's my memory that's failing me. <br/> <br/> We're going to play some memory games so you can help me fix our robot friend.",
+      "text2": "Press <span class ='button-text'>ANY KEY</span> to continue."
+    }, 
+    "intro_3_block": {
+      "text1": " This is what the game will look like. Do you see any letters that match back to back? <br/> <br/> First, you'll help us reorder robot's arm and leg mix-up and then we'll improve his memory skills. <br/> <br/> Mr. Robot needs different levels of difficulty to really train all that complicated robot memory, so our instructions will change throughout. Sometimes we'll be looking for matching pairs of letters back to back and sometimes with gaps in the middle. I'll let you know when we're switching!  ",
+      "text2": "Press <span class='button-text'>ANY KEY</span> to continue. "
+    }, 
+    "intro_4_block": {
+      "text1": " Let's start by getting you familiar with the tools you'll use today. My assistant, Cat-rina Whiskers, will walk us through all our instructions. ",
+      "text2": "Press <span class='button-text'>ANY KEY</span> to learn how to play. "
     }
   },
-  "practice": {
-    "intro": {
-      "text1": "Instructions",
-      "text2": "In this activity, you are going to read some sentences and decide whether each sentence is true or false.",
-      "text3": "Press the <span class='orange'><b> LEFT ARROW KEY </b></span> if a sentence is false. For example, 'A fish lives on land', is a false sentence so you would press the <span class='orange'> <b> left arrow key. </b> </span>",
-      "text4": "Press the <span class='blue'><b> RIGHT ARROW KEY </b></span> if a sentence is true. For example, 'A cow is an animal', is a true sentence so you would press the <span class='blue'> <b> right arrow key. </b> </span>",
-      "text5": "Let's do some for practice!",
-      "text6": "Press <span class='yellow'>any key</span> to begin the practice sentences"
+  "instructions": {
+    "instructions_1_block": {
+      "text1": " To play this game and help Mr. Robot, we're going to use our left and right arrow keys. Can you find yours? They'll look like the ones on my screen. Let's try it out, press your <span class='right-arrow-blue'> RIGHT arrow key</span> to continue. ",
+      "text2": "Press the<span class='right-arrow-blue'> RIGHT arrow key</span> to continue. "
+
     },
-    "postPracticeIntro": {
-      "text1": "Great job on those practice sentences!",
+    "right_arrow_feedback_node": {
+      "text1": " Awesome job! That's correct, that's your <span class='right-arrow-blue'> right arrow key</span>. We'll use this button to tell Mr. Robot when letters <i> do </i> match.  ",
       "text2": "You are ready to start the game.",
-      "text3": "You will have <b> 3 minutes </b> to label as many sentences as you can.",
-      "text4": "Read each sentence silently and work as fast as you can without making mistakes.",
-      "text5": "It's okay if you don't know the answer. Give it your best guess and move to the next one."
+      "text3": " Hmm, not quite! Let's try that again. This is the button you're looking for. ",
+      "text4": "Press <span class='right-arrow-blue'>RIGHT arrow key</span> to continue. "
     },
-    "feedback": {
-      "text1": "You pressed the {{arrow}} arrow key for {{type}} sentences.",
-      "text2": "is a {{type}} sentence. Press the {{arrow}} arrow key to continue."
+    "instructions_2_block": {
+      "text1": " Let's review how you'll use your arrow keys. Your screen is going to flash with letters and <i> <strong> for now </i> </strong> you'll tell me when the letters match back to back. You'll use your <span class='left-arrow-red'> left arrow key to tell me if the current letter does not match the last</span> and the <span class='right-arrow-blue'>right arrow key to tell me if it does match</span>. <br/> <br/> Capitalization doesn't matter, so it doesn't matter if it's a little t or a big T! <br/> <br/> Press the <span class='left-arrow-red'>left arrow key</span> for the very first letter you see (to say there wasn't a match since nothing came before it!) ",
+      "text2": "Press <span class='button-text'>ANY KEY</span> to practice. "
     },
-    "postPracticeReminder": {
-      "text1": "Press the <span class='orange'> <b> left arrow key </b> </span> for <span class='orange'> <b> false sentences.</b> </span>",
-      "text2": "Press the <span class='blue'> <b> right arrow key </b> </span> for <span class='blue'> <b> true sentences. </b> </span>",
-      "text3": "Do your best!",
-      "text4": "Ready?"
-    }
-  },
-  "characterSelect": {
-    "studentIntro": {
-      "paragraph1": "Hi Professor! It's nice to meet you. My name is",
-      "paragraph2": "I'm having trouble with my sentence reading homework. I need to finish it so I can",
-      "paragraph3": "Can you help me?"
-    },
-    "studentSelect": {
-      "paragraph1": "Now, let's meet your students!",
-      "paragraph2": "Press the number key on your keyboard to pick the student you would like to work with.",
-      "paragraph3": "Press <span class='yellow'>a number key</span> to pick a student"
+    "instructions_3_block": {
+      "text1": " Awesome, now that you have the hang of it, I'm going to let you take hold of the tools! Remember that our instructions will change throughout the game, so pay careful attention! ",
+      "text2": "Press <span class='button-text'>ANY KEY</span> when you're ready to begin. "
     }
   },
   "gameBreak": {
-    "halfwayScreen": {
-      "text1": "Great job!",
-      "text2": "You are halfway through - let's keep going.",
-      "text3": "Wow! I'm getting the hang of this!",
-      "text4": "We're halfway through - let's keep going."
+    "game_break_1_block": {
+      "text1": "Look, we're a little closer!</span> <br/> <br/>Keep going. Press any key to continue!",
+      "text2": "Press <span class='button-text'>ANY KEY</span> continue."
     },
-    "endScreen": {
-      "text1": "Amazing job!",
-      "text2": "You are all done. Thank you so much for completing our activity.",
-      "text3": "Amazing job, Professor!",
-      "text4": "finished in record time. Thank you for your help!"
+    "game_break_2_block": {
+      "text1": "Amazing work!</span> <br/> <br/>Keep going. Press any button to keep working on Mr. Robot.",
+      "text2": "Press <span class='button-text'>ANY KEY</span> continue."
     },
-    "debrief": {
-      "text1": "Thank you for your participation!",
-      "text2": "Your responses have been saved."
+    "game_break_3_block": {
+      "text1": " Wow, what a silly mistake! <br/> <br/>Keep going to help Mr. Robot! ",
+      "text2": "Press <span class='button-text'>ANY KEY</span> continue."
+    },
+    "game_break_4_block": {
+      "text1": "Woah, that's amazing!</span> <br/> <br/> Robot looks just like the instruction book said he would. Now, I need you to help our robot friend game some memory skills of his own. Let's do it! ",
+      "text2": "Press <span class='button-text'>ANY KEY</span> continue."
+    },
+    "game_break_5_block": {
+      "text1": " Robot's memory is starting to fill up! Keep working hard. Press any button continue.",
+      "text2": "Press <span class='button-text'>ANY KEY</span> continue."
+    },
+    "game_break_6_block": {
+      "text1": " Mr. Robot is going to have an amazing memory!",
+      "text2": "Press <span class='button-text'>ANY KEY</span> continue."
+    },
+    "game_break_7_block": {
+      "text1": " His memory is really shaping up well! Press any button to keep improving Robot's memory! ",
+      "text2": "Press <span class='button-text'>ANY KEY</span> continue."
+    },
+    "generic_game_break_block": {
+      "text1": "Good work!</span> <br/> <br/>You are working so hard, Mr. Robot owes you big time! Press any key to continue improving Robot's memory!",
+      "text2": "Press <span class='button-text'>ANY KEY</span> continue."
+    },
+    "level_up_block": {
+      "text1": " Woohoo, level up! </h1>  <p class='block-text'> You're doing so great that Mr. Robot is ready to kick it up a notch! Press any key to see what your new instructions are.</p>",
+      "text2": "Press the<span class='button-text'> ANY KEY</span> to continue. "
+    },
+    "level_down_block": {
+      "text1": " Uh oh, level down. ): </h1>  <p class='block-text'> Robot's getting a little overwhelmed. Let's back it up for him. Press any key to see what your new instructions are </p>",
+      "text2": "Press the<span class='button-text'> ANY KEY</span> to continue. "
+    }
+  },
+  "experimentHelpers": {
+    "end_game_block": {
+      "text1": "Look at that, Mr. Robot's memory is all full!</span> <br/> <br/>Thanks so much for all your help today. you helped us build our very first robot and we couldn't be more thankful. Press any key when you're ready to sign off!",
+      "text2": "Press <span class='button-text'>ANY KEY</span> to sign off."
+    },
+    "start_control_block": {
+      "text1": "In this block you do not have to match letters to previous letters.</h1><p class='block-text'> Instead, press the <span class='right-arrow-blue'>${utils.CORRECT_KEY_TEXT}</span> everytime you see a 't' or 'T' and the <span class='left-arrow-red'>${utils.WRONG_KEY_TEXT}</span> for all other letters.</p><p class = center-block-text>Press <strong>the space bar</strong> to begin.</p>",
+      "text2": "Press the<span class='button-text'> SPACE BAR</span> to continue. "
+    },
+    "getCommonOneBackProperties": {
+      "text1": " Remember, press the <span class='right-arrow-blue'>RIGHT arrow key when the letters match</span> and the <span class='left-arrow-red'>LEFT arrow key when the letters do not match</span>.</strong> <br/> <br/> We're practicing to recognize matching letters ${(delay === 1) ? 'back to back' : 'with the one 2 screens ago'}. <br/> <br/> That means you were comparing ${staticStims[idx]} and ${staticStims[idx - delay]}. You hit the ${is_right_arrow ? 'right' : 'left'} arrow key which is for ${is_right_arrow ? 'match' : 'not a match'}. <br/> <br/> ${staticStims[idx]} and ${staticStims[idx - delay]} ${(staticStims[idx] === staticStims[idx - delay]) ? 'do' : 'do not'} match, so that's ${data.correct ? 'correct!' : 'incorrect.'} We'd press the ${(staticStims[idx] === staticStims[idx - delay]) ? 'RIGHT arrow' : 'LEFT arrow'} key. ",
+      "text2": "Press <span class='button-text'>the ${(staticStims[idx] === staticStims[idx - delay]) ? 'RIGHT arrow' : 'LEFT arrow'} key</span> to continue. "
+    },
+    "post_task_block": {
+      "text1": "Please summarize what you were asked to do in this task.",
+      "text2": "Do you have any comments about this task?"
     }
   },
   "terms": {

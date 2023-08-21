@@ -6,15 +6,17 @@ import jsPsychCallFunction from '@jspsych/plugin-call-function';
 import jsPsychSurveyText from '@jspsych/plugin-survey-text';
 import jsPsychAudioKeyboardResponse from "@jspsych/plugin-audio-keyboard-response";
 import { generateAssetObject } from "@bdelab/roar-utils";
+import i18next from "i18next";
 import assets from '../../assets.json';
 import { jsPsych } from './jsPsych';
 import { utils } from '../utils';
+import './i18n';
 
 import './css/roar.css';
 import './css/custom.css';
 
 const bucketURI = 'https://storage.googleapis.com/roar-anb';
-const mediaAssets = generateAssetObject(assets, bucketURI);
+export const mediaAssets = generateAssetObject(assets, bucketURI);
 
 const queryString = new URL(window.location).search;
 const urlParams = new URLSearchParams(queryString);
@@ -256,8 +258,8 @@ export const post_task_block = {
     save_trial: true,
   },
   questions: [
-    { prompt: "Please summarize what you were asked to do in this task." },
-    { prompt: "Do you have any comments about this task?" },
+    { prompt: i18next.t('experimentHelpers.post_task_block.text1') },
+    { prompt: i18next.t('experimentHelpers.post_task_block.text2') },
   ],
   rows: [15, 15],
   columns: [60, 60],
@@ -292,8 +294,8 @@ export const update_target_block = {
 
 export const start_control_block = {
   type: jsPsychHtmlKeyboardResponse,
-  stimulus: `<div class = "centerbox"><h1 class = "block-text">In this block you do not have to match letters to previous letters.</h1><p class = "block-text"> Instead, press the <span class="right-arrow-blue">${utils.CORRECT_KEY_TEXT}</span> everytime you see a "t" or "T" and the <span class="left-arrow-red">${utils.WRONG_KEY_TEXT}</span> for all other letters.</p><p class = center-block-text>Press <strong>the space bar</strong> to begin.</p></div>
-  <div class="press-key">Press the<span class ="button-text"> SPACE BAR</span> to continue. </div>`,
+  stimulus: `<div class = "centerbox"><h1 class = "block-text">${i18next.t('experimentHelpers.start_control_block.text1')}</div>
+  <div class="press-key">${i18next.t('experimentHelpers.start_control_block.text2')}</div>`,
   choices: [" "],
   data: {
     trial_id: "instruction",
@@ -402,192 +404,6 @@ export const adaptive_test_node = {
   },
 };
 
-export const welcome_screen_block = {
-  type: jsPsychAudioKeyboardResponse,
-  stimulus: mediaAssets.audio.welcomeAudio,
-  choices: "ALL_KEYS",
-  response_allowed_while_playing: true,
-  prompt: `<div class = "background">
-  <img class = "lab-background-image" src="${mediaAssets.images.welcomeAnimated}"></img>  
-  </div>
-  <div class="press-key">Press <span class = "button-text">ANY KEY</span> to get started! </div>`,
-};
-
-export const intro_1_block = {
-  type: jsPsychAudioKeyboardResponse,
-  stimulus: mediaAssets.audio.intro1,
-  choices: "ALL_KEYS",
-  response_allowed_while_playing: true,
-  prompt: `<div class = "background">
-  <img class = "lab-background-image" src="${mediaAssets.images.backgroundImage}"></img>  
-  </div>
-  <div class="row">
-    <div class="column_1">
-      <img class="bookleft" src="${mediaAssets.images.woofusInstructionBookIntro}"></img>
-      </div>
-    <div class="text-box">
-      <p class="middle"> Hi Friend! My name is Dr. Woofus and I'm Stanford's only dog scientist. Today we built our very first robot, but something doesn't look quite right. <br/> <br/> This is what the instruction book says he's <i> supposed </i> to look like.</p>
-    </div>
-  </div>
-<div class="press-key">Press <span class = "button-text">ANY KEY</span> to see what we're working with! </div>`,
-};
-
-export const intro_2_block = {
-  type: jsPsychAudioKeyboardResponse,
-  stimulus: mediaAssets.audio.intro2,
-  choices: "ALL_KEYS",
-  response_allowed_while_playing: true,
-  prompt: `<div class = "background">
-  <img class = "lab-background-image" src="${mediaAssets.images.backgroundImage}"></img>  
-  </div>
-  <div class="row">
-    <div class="column_1">
-      <img class="woofusleft" src="${mediaAssets.images.robotIntro}"></img>
-      </div>
-    <div class="text-box">
-      <p class="middle"> See what I mean? Somehow his arms and legs ended up all twisted. <br/> <br/> We need your help figuring out where we went wrong. I think it's my memory that's failing me. <br/> <br/> We're going to play some memory games so you can help me fix our robot friend. </p>
-    </div>
-  </div>
-<div class="press-key">Press <span class = "button-text">ANY KEY</span> to continue. </div>`,
-};
-
-export const intro_3_block = {
-  type: jsPsychAudioKeyboardResponse,
-  stimulus: mediaAssets.audio.intro3,
-  choices: "ALL_KEYS",
-  response_allowed_while_playing: true,
-  prompt: `<div class = "background">
-  <img class = "lab-background-image" src="${mediaAssets.images.backgroundImage}"></img>  
-  </div>
-  <div class="row">
-    <div class="column_1">
-      <img class="trial-animation-left" src="${mediaAssets.images.trialScreen2}"></img>
-      </div>
-    <div class="text-box">
-      <p class="middle"> This is what the game will look like. Do you see any letters that match back to back? <br/> <br/> First, you'll help us reorder robot's arm and leg mix-up and then we'll improve his memory skills. <br/> <br/> Mr. Robot needs different levels of difficulty to really train all that complicated robot memory, so our instructions will change throughout. Sometimes we'll be looking for matching pairs of letters back to back and sometimes with gaps in the middle. I'll let you know when we're switching!  </p>
-    </div>
-  </div>
-<div class="press-key">Press <span class = "button-text">ANY KEY</span> to continue. </div>`,
-};
-
-export const intro_4_block = {
-  type: jsPsychAudioKeyboardResponse,
-  stimulus: mediaAssets.audio.intro4,
-  choices: "ALL_KEYS",
-  response_allowed_while_playing: true,
-  prompt: `<div class = "background">
-  <img class = "lab-background-image" src="${mediaAssets.images.backgroundImage}"></img>  
-  </div>
-  <div class="row">
-    <div class="column_1">
-      <img class="catleft" src="${mediaAssets.images.catIntro}"></img>
-      </div>
-    <div class="text-box">
-      <p class="middle"> Let's start by getting you familiar with the tools you'll use today. My assistant, Cat-rina Whiskers, will walk us through all our instructions. </p>
-    </div>
-  </div>
-<div class="press-key">Press <span class = "button-text">ANY KEY</span> to learn how to play. </div>`,
-};
-
-export const instructions_1_block = {
-  type: jsPsychAudioKeyboardResponse,
-  stimulus: mediaAssets.audio.instructions1Audio,
-  response_allowed_while_playing: true,
-  choices: "ALL_KEYS",
-  on_finish: (data) => {
-    data.correct = jsPsych.pluginAPI.compareKeys(data.response, utils.CORRECT_KEY_PRESS);
-  },
-  prompt: `<div class = "background">
-  <img class = "lab-background-image" src="${mediaAssets.images.backgroundImage}"></img>  
-  </div>
-  <div class="row">
-    <div class="column_1">
-      <img class="catleft" src="${mediaAssets.images.catArrowsAnimated}"></img>
-      </div>
-    <div class="text-box">
-      <p class="middle"> To play this game and help Mr. Robot, we're going to use our left and right arrow keys. Can you find yours? They'll look like the ones on my screen. Let's try it out, press your <span class ="right-arrow-blue"> RIGHT arrow key</span> to continue. </p>
-    </div>
-  </div>
-<div class="press-key">Press the<span class ="right-arrow-blue"> RIGHT arrow key</span> to continue. </div>`,
-};
-
-export const right_arrow_feedback_node = {
-  type: jsPsychAudioKeyboardResponse,
-  response_allowed_while_playing: true,
-  trial_duration: null,
-  stimulus: () => {
-    const last_trial_correct = jsPsych.data.get().last(1).values()[0].correct;
-    if (last_trial_correct) {
-      return mediaAssets.audio.rightArrowCorrect;
-    }
-    return mediaAssets.audio.rightArrowIncorrect;
-  },
-  choices: "ALL_KEYS",
-  on_finish: (data) => {
-    data.correct = jsPsych.pluginAPI.compareKeys(data.response, utils.CORRECT_KEY_PRESS);
-  },
-  prompt: () => {
-    // checking if the last trial was correct to push appropriate feedback prompt
-    const last_trial_correct = jsPsych.data.get().last(1).values()[0].correct;
-    if (last_trial_correct) {
-      return `<div class = "background">
-      <img class = "lab-background-image" src="${mediaAssets.images.backgroundImage}"></img>  
-      </div>
-      <div class="row">
-        <div class="column_1">
-          <img class="catleft" src="${mediaAssets.images.catSmileAnimated}"></img>
-          </div>
-        <div class="text-box">
-          <p class="middle"> Awesome job! That's correct, that's your <span class ="right-arrow-blue"> right arrow key</span>. We'll use this button to tell Mr. Robot when letters <i> do </i> match.  </p>
-        </div>
-      </div>
-    <div class="press-key">Press <span class = "button-text">ANY KEY</span> to continue. </div>`;
-    }
-    return `<div class = "background">
-    <img class = "lab-background-image" src="${mediaAssets.images.backgroundImage}"></img>  
-    </div>
-    <div class="row">
-      <div class="column_1">
-        <img class="catleft" src="${mediaAssets.images.catRightArrowFrown}"></img>
-        </div>
-      <div class="text-box">
-        <p class="middle"> Hmm, not quite! Let's try that again. This is the button you're looking for. </p>
-      </div>
-    </div>
-  <div class="press-key">Press <span class ="right-arrow-blue">RIGHT arrow key</span> to continue. </div>`;
-  },
-};
-
-export const right_arrow_redo = {
-  timeline: [right_arrow_feedback_node],
-  loop_function: function () {
-    const last_trial_correct = jsPsych.data.get().last(2).values()[0].correct;
-    if (last_trial_correct) {
-      return false;
-    }
-    return true;
-  },
-};
-
-export const instructions_2_block = {
-  type: jsPsychAudioKeyboardResponse,
-  stimulus: mediaAssets.audio.instructions2Audio,
-  choices: "ALL_KEYS",
-  response_allowed_while_playing: true,
-  prompt: `<div class = "background">
-  <img class = "lab-background-image" src="${mediaAssets.images.backgroundImage}"></img>  
-  </div>
-  <div class="row">
-    <div class="column_1">
-      <img class="trial-animation-left" src="${mediaAssets.images.instructions3}"></img>
-      </div>
-    <div class="text-box">
-      <p class="middle"> Let's review how you'll use your arrow keys. Your screen is going to flash with letters and <i> <strong> for now </i> </strong> you'll tell me when the letters match back to back. You'll use your <span class="left-arrow-red"> left arrow key to tell me if the current letter does not match the last</span> and the <span class ="right-arrow-blue">right arrow key to tell me if it does match</span>. <br/> <br/> Capitalization doesn't matter, so it doesn't matter if it's a little t or a big T! <br/> <br/> Press the <span class="left-arrow-red">left arrow key</span> for the very first letter you see (to say there wasn't a match since nothing came before it!) </p>
-    </div>
-  </div>
-<div class="press-key">Press <span class="button-text">ANY KEY</span> to practice. </div>`,
-};
-
 const staticStims = [
   'J',
   'F',
@@ -630,10 +446,10 @@ function getCommonOneBackProperties(idx) {
           <img class="catleft" src="${(correct_practice_trial_response === utils.CORRECT_KEY_PRESS) ? mediaAssets.images.catRightArrowFlash : mediaAssets.images.catLeftArrowFlash}"></img>
           </div>
         <div class="text-box">
-          <p class="middle"> <strong> Remember, press the <span class="right-arrow-blue">RIGHT arrow key when the letters match</span> and the <span class="left-arrow-red">LEFT arrow key when the letters do not match</span>.</strong> <br/> <br/> We're practicing to recognize matching letters ${(delay === 1) ? "back to back" : "with the one 2 screens ago"}. <br/> <br/> That means you were comparing ${staticStims[idx]} and ${staticStims[idx - delay]}. You hit the ${is_right_arrow ? "right" : "left"} arrow key which is for ${is_right_arrow ? "match" : "not a match"}. <br/> <br/> ${staticStims[idx]} and ${staticStims[idx - delay]} ${(staticStims[idx] === staticStims[idx - delay]) ? "do" : "do not"} match, so that's ${data.correct ? "correct!" : "incorrect."} We'd press the ${(staticStims[idx] === staticStims[idx - delay]) ? "RIGHT arrow" : "LEFT arrow"} key. </p>
+          <p class="middle"> <strong>${i18next.t('experimentHelpers.getCommonOneBackProperties.text1')}</p>
         </div>
       </div>
-    <div class="press-key">Press <span class="button-text">the ${(staticStims[idx] === staticStims[idx - delay]) ? "RIGHT arrow" : "LEFT arrow"} key</span> to continue. </div>`;
+    <div class="press-key">${i18next.t('experimentHelpers.getCommonOneBackProperties.text2')}</div>`;
     },
   };
 }
@@ -880,181 +696,10 @@ export function getNbackPracticeTrials() {
   return static_practice_trials;
 }
 
-export const instructions_3_block = {
-  type: jsPsychAudioKeyboardResponse,
-  stimulus: mediaAssets.audio.instructions3Audio,
-  choices: "ALL_KEYS",
-  response_allowed_while_playing: true,
-  prompt: `<div class = "background">
-  <img class = "lab-background-image" src="${mediaAssets.images.backgroundImage}"></img>  
-  </div>
-  <div class="row">
-    <div class="column_1">
-    <img class="catleft" src="${mediaAssets.images.catSmileAnimated}"></img>
-    </div>
-    <div class="text-box">
-      <p class="middle"> Awesome, now that you have the hang of it, I'm going to let you take hold of the tools! Remember that our instructions will change throughout the game, so pay careful attention! </p>
-    </div>
-  </div>
-<div class="press-key">Press <span class="button-text">ANY KEY</span> when you're ready to begin. </div>`,
-};
-
 const instructions_trial_parameters = {
   type: jsPsychAudioKeyboardResponse,
   choices: "ALL_KEYS",
   response_allowed_while_playing: true,
-};
-
-const game_break_1_block = {
-  type: jsPsychAudioKeyboardResponse,
-  choices: "ALL_KEYS",
-  response_allowed_while_playing: true,
-  stimulus: mediaAssets.audio.fixRobot1,
-  prompt: `<div class = "background">
-  <img class = "lab-background-image" src="${mediaAssets.images.backgroundImage}"></img>  
-  </div>
-  <div class="row">
-    <div class="column_1">
-    <img class="catleft" src="${mediaAssets.images.gameBreak1Animation}"></img>
-    </div>
-    <div class="text-box" style="border-radius:30%">
-    <p class="middle"> <span style="font-size: 5vh; color: rgba(76,101,139,1); text-align: center; ">Look, we're a little closer!</span> <br/> <br/>Keep going. Press any key to conitnue!</p>  
-    </div>
-  </div>
-<div class="press-key">Press <span class="button-text">ANY KEY</span> continue.</div>`,
-};
-
-const game_break_2_block = {
-  type: jsPsychAudioKeyboardResponse,
-  choices: "ALL_KEYS",
-  response_allowed_while_playing: true,
-  stimulus: mediaAssets.audio.fixRobot2,
-  prompt: `<div class = "background">
-  <img class = "lab-background-image" src="${mediaAssets.images.backgroundImage}"></img>  
-  </div>
-  <div class="row">
-    <div class="column_1">
-    <img class="catleft" src="${mediaAssets.images.gameBreak2Animation}"></img>
-    </div>
-    <div class="text-box" style="border-radius:30%">
-    <p class="middle"> <span style="font-size: 5vh; color: rgba(76,101,139,1); text-align: center; ">Amazing work!</span> <br/> <br/>Keep going. Press any button to keep working on Mr. Robot.</p>  
-    </div>
-  </div>
-<div class="press-key">Press <span class="button-text">ANY KEY</span> continue.</div>`,
-};
-
-const game_break_3_block = {
-  type: jsPsychAudioKeyboardResponse,
-  choices: "ALL_KEYS",
-  response_allowed_while_playing: true,
-  stimulus: mediaAssets.audio.fixRobot3,
-  prompt: `<div class = "background">
-  <img class = "lab-background-image" src="${mediaAssets.images.backgroundImage}"></img>  
-  </div>
-  <div class="row">
-    <div class="column_1">
-    <img class="catleft" src="${mediaAssets.images.gameBreak3Animation}"></img>
-    </div>
-    <div class="text-box" style="border-radius:30%">
-    <p class="middle"> Wow, what a silly mistake! <br/> <br/>Keep going to help Mr. Robot! </p>  
-    </div>
-  </div>
-<div class="press-key">Press <span class="button-text">ANY KEY</span> continue.</div>`,
-};
-
-const game_break_4_block = {
-  type: jsPsychAudioKeyboardResponse,
-  choices: "ALL_KEYS",
-  response_allowed_while_playing: true,
-  stimulus: mediaAssets.audio.fixRobot4,
-  prompt: `<div class = "background">
-  <img class = "lab-background-image" src="${mediaAssets.images.backgroundImage}"></img>  
-  </div>
-  <div class="row">
-    <div class="column_1">
-    <img class="catleft" src="${mediaAssets.images.gameBreak4Animation}"></img>
-    </div>
-    <div class="text-box" style="border-radius:30%">
-    <p class="middle"> <span style="font-size: 5vh; color: rgba(76,101,139,1); text-align: center; ">Woah, that's amazing!</span> <br/> <br/> Robot looks just like the instruction book said he would. Now, I need you to help our robot friend game some memory skills of his own. Let's do it! </p>  
-    </div>
-  </div>
-<div class="press-key">Press <span class="button-text">ANY KEY</span> continue.</div>`,
-};
-
-const game_break_5_block = {
-  type: jsPsychAudioKeyboardResponse,
-  choices: "ALL_KEYS",
-  response_allowed_while_playing: true,
-  stimulus: mediaAssets.audio.fixRobot5,
-  prompt: `<div class = "background">
-  <img class = "lab-background-image" src="${mediaAssets.images.backgroundImage}"></img>  
-  </div>
-  <div class="row">
-    <div class="column_1">
-    <img class="catleft" src="${mediaAssets.images.gameBreak5Animation}"></img>
-    </div>
-    <div class="text-box" style="border-radius:30%">
-    <p class="middle"> Robot's memory is starting to fill up! Keep working hard. Press any button continue.</p>  
-    </div>
-  </div>
-<div class="press-key">Press <span class="button-text">ANY KEY</span> continue.</div>`,
-};
-
-const game_break_6_block = {
-  type: jsPsychAudioKeyboardResponse,
-  choices: "ALL_KEYS",
-  response_allowed_while_playing: true,
-  stimulus: mediaAssets.audio.fixRobot6,
-  prompt: `<div class = "background">
-  <img class = "lab-background-image" src="${mediaAssets.images.backgroundImage}"></img>  
-  </div>
-  <div class="row">
-    <div class="column_1">
-    <img class="catleft" src="${mediaAssets.images.gameBreak6Animation}"></img>
-    </div>
-    <div class="text-box" style="border-radius:30%">
-    <p class="middle"> Mr. Robot is going to have an amazing memory!</p>  
-    </div>
-  </div>
-<div class="press-key">Press <span class="button-text">ANY KEY</span> continue.</div>`,
-};
-
-const game_break_7_block = {
-  type: jsPsychAudioKeyboardResponse,
-  choices: "ALL_KEYS",
-  response_allowed_while_playing: true,
-  stimulus: mediaAssets.audio.fixRobot7,
-  prompt: `<div class = "background">
-  <img class = "lab-background-image" src="${mediaAssets.images.backgroundImage}"></img>  
-  </div>
-  <div class="row">
-    <div class="column_1">
-    <img class="catleft" src="${mediaAssets.images.gameBreak7Animation}"></img>
-    </div>
-    <div class="text-box" style="border-radius:30%">
-    <p class="middle"> His memory is really shaping up well! Press any button to keep improving Robot's memory! </p>  
-    </div>
-  </div>
-<div class="press-key">Press <span class="button-text">ANY KEY</span> continue.</div>`,
-};
-
-export const generic_game_break_block = {
-  type: jsPsychAudioKeyboardResponse,
-  stimulus: mediaAssets.audio.genericGameBreak,
-  choices: "ALL_KEYS",
-  response_allowed_while_playing: true,
-  prompt: `  <div class = "background">
-  <img class = "lab-background-image" src="${mediaAssets.images.backgroundImage}"></img>  
-  </div>
-  <div class="row">
-    <div class="column_1">
-    <img class="catleft" src="${mediaAssets.images.woofusAnimated}"></img>
-    </div>
-    <div class="text-box" style="border-radius:30%">
-    <p class="middle"> <span style="font-size: 5vh; color: rgba(76,101,139,1); text-align: center; ">Good work!</span> <br/> <br/>You are working so hard, Mr. Robot owes you big time! Press any key to conitnue improving Robot's memory!</p>  
-    </div>
-  </div>
-<div class="press-key">Press <span class="button-text">ANY KEY</span> continue.</div>`,
 };
 
 export const end_game_block = {
@@ -1070,29 +715,11 @@ export const end_game_block = {
     <img class="catleft" src="${mediaAssets.images.gameBreak9Animation}"></img>
     </div>
     <div class="text-box" style="border-radius:30%">
-    <p class="middle"> <span style="font-size: 5vh; color: rgba(76,101,139,1); text-align: center; ">Look at that, Mr. Robot's memory is all full!</span> <br/> <br/>Thanks so much for all your help today. you helped us build our very first robot and we couldn't be more thankful. Press any key when you're ready to sign off!</p>  
+    <p class="middle"> <span style="font-size: 5vh; color: rgba(76,101,139,1); text-align: center; ">${i18next.t('experimentHelpers.end_game_block.text1')}</p>  
     </div>
   </div>
-<div class="press-key">Press <span class="button-text">ANY KEY</span> to sign off.</div>`,
+<div class="press-key">${i18next.t('experimentHelpers.end_game_block.text2')}</div>`,
   on_finish: assessPerformance,
-};
-
-export const level_up_block = {
-  type: jsPsychAudioKeyboardResponse,
-  stimulus: mediaAssets.audio.levelUpSeeNewInstructions,
-  choices: "ALL_KEYS",
-  response_allowed_while_playing: true,
-  prompt: `<div class = "centerbox"> <h1 class = "block-text"> Woohoo, level up! </h1>  <p class = "block-text"> You're doing so great that Mr. Robot is ready to kick it up a notch! Press any key to see what your new instructions are.</p></div>
-  <div class="press-key">Press the<span class ="button-text"> ANY KEY</span> to continue. </div>`,
-};
-
-export const level_down_block = {
-  type: jsPsychAudioKeyboardResponse,
-  stimulus: mediaAssets.audio.levelDown,
-  choices: "ALL_KEYS",
-  response_allowed_while_playing: true,
-  prompt: `<div class = "centerbox"> <h1 class = "block-text"> Uh oh, level down. ): </h1>  <p class = "block-text"> Robot's getting a little overwhelmed. Let's back it up for him. Press any key to see what your new instructions are </p></div>
-  <div class="press-key">Press the<span class ="button-text"> ANY KEY</span> to continue. </div>`,
 };
 
 export const instructions = [
@@ -1221,34 +848,6 @@ export const instructions_loop = {
     return false;
   },
 };
-
-export const game_break_blocks = [
-  {}, // dummy fix robot video
-  {
-    timeline: [game_break_1_block],
-  },
-  {
-    timeline: [game_break_2_block],
-  },
-  {
-    timeline: [game_break_3_block],
-  },
-  {
-    timeline: [game_break_4_block],
-  },
-  {
-    timeline: [game_break_5_block],
-  },
-  {
-    timeline: [game_break_6_block],
-  },
-  {
-    timeline: [game_break_7_block],
-  },
-  {
-    timeline: [generic_game_break_block],
-  },
-];
 
 export const exit_fullscreen = {
   type: jsPsychFullScreen,
