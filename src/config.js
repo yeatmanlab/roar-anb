@@ -122,7 +122,7 @@ export const initRoarJsPsych = (config) => {
       if (config.taskVariant === 'demo') {
         window.location.href = 'https://roar.stanford.edu/';
       } else if ((config.taskVariant === 'school') && (config.story)) {
-        window.location.href = 'https://reading.stanford.edu/?g=XXX&c=1'; // TO DO: ADD REDIRECT FOR SCHOOLS
+        window.location.href = 'https://reading.stanford.edu/g=1416&c=1'; // TO DO: ADD REDIRECT FOR SCHOOLS
       } else if ((config.taskVariant === 'school') && (!config.story)) {
         window.location.href = 'https://reading.stanford.edu/?g=1414&c=1';
       } else { window.location.href = 'https://roar.stanford.edu/'; }
