@@ -64,6 +64,7 @@ export const initConfig = async () => {
   const skip = urlParams.get("skip");
   const audioFeedback = urlParams.get("feedback") || "binary";
   const story = urlParams.get("story") || true;
+  const fromDashboard = urlParams.get("fromDashboard") === "true" ? true : false;
   utils.NUM_BLOCKS = urlParams.get("numBlocks") || utils.NUM_BLOCKS;
   utils.ADAPTIVE_NUM_TRIALS = urlParams.get("adaptiveNumTrials") || utils.ADAPTIVE_NUM_TRIALS;
   utils.SHOW_CONTROL_TRIALS = urlParams.get("controlTrials") || utils.SHOW_CONTROL_TRIALS;
@@ -115,20 +116,18 @@ export const initRoarJsPsych = (config) => {
 
   // TODO: Customize the redirect URLs here by inserting the correct game token.
   const redirect = () => {
-    if (config.taskVariant === 'demo') {
-      // TODO: Fix the redirect URL here by replacing the 'XXXX' in the URL below
-      window.location.href = 'https://roar.stanford.edu/';
-      // TODO: Replace the pipeline value here with one that you want
-    } else if (config.taskVariant === 'school') {
-      // TODO: Fix the redirect URL here by replacing the 'XXXX' in the URL below
-      window.location.href = 'https://reading.stanford.edu/?g=XXXX&c=1'; // TO DO: ADD REDIRECT FOR SCHOOLS
-      // TODO: Replace the pipeline value here with one that you want
-    } else { window.location.href = 'https://roar.stanford.edu/'; }
-    // Here, we refresh the page rather than redirecting back to the dashboard
-    // window.location.reload();
+    if (config.fromDashboard) {
+      window.location.href = 'https://roar.education';
+    } else if (!config.fromDashboard) {
+      if (config.taskVariant === 'demo') {
+        window.location.href = 'https://roar.stanford.edu/';
+      } else if ((config.taskVariant === 'school') && (config.story)) {
+        window.location.href = 'https://reading.stanford.edu/?g=XXX&c=1'; // TO DO: ADD REDIRECT FOR SCHOOLS
+      } else if ((config.taskVariant === 'school') && (!config.story)) {
+        window.location.href = 'https://reading.stanford.edu/?g=1414&c=1';
+      } else { window.location.href = 'https://roar.stanford.edu/'; }
+    }
   };
-  // You can add additional pipeline-dependent redirect URLs here using
-  // additional `else if` clauses.
 
   const jsPsych = initJsPsych({
     show_progress_bar: true,
