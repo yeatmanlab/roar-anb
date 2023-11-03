@@ -52,7 +52,7 @@ export const taskInfo = configTaskInfo();
 export const initConfig = async () => {
   const queryString = new URL(window.location).search;
   const urlParams = new URLSearchParams(queryString);
-  const pid = urlParams.get('participant') || null;
+  const pid = urlParams.get("PROLIFIC_PID") || urlParams.get("participant");
   const studyId = urlParams.get('studyId') || null;
   const labId = urlParams.get("labId") || null;
   // const classId = urlParams.get('classId') || null;
@@ -63,6 +63,7 @@ export const initConfig = async () => {
   const grade = urlParams.get('grade') || null;
   const skip = urlParams.get("skip");
   const audioFeedback = urlParams.get("feedback") || "binary";
+  const story = urlParams.get("story") || true;
   utils.NUM_BLOCKS = urlParams.get("numBlocks") || utils.NUM_BLOCKS;
   utils.ADAPTIVE_NUM_TRIALS = urlParams.get("adaptiveNumTrials") || utils.ADAPTIVE_NUM_TRIALS;
   utils.SHOW_CONTROL_TRIALS = urlParams.get("controlTrials") || utils.SHOW_CONTROL_TRIALS;
@@ -93,6 +94,7 @@ export const initConfig = async () => {
     skip: skip,
     audioFeedback: audioFeedback,
     utils: utils,
+    story: (story !== "false"),
   };
 
   return config;
