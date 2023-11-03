@@ -96,6 +96,7 @@ export const initConfig = async () => {
     audioFeedback: audioFeedback,
     utils: utils,
     story: (story !== "false"),
+    fromDashboard: fromDashboard,
   };
 
   return config;
@@ -117,7 +118,7 @@ export const initRoarJsPsych = (config) => {
   // TODO: Customize the redirect URLs here by inserting the correct game token.
   const redirect = () => {
     if (config.fromDashboard) {
-      window.location.href = 'https://roar.education';
+      window.location.href = `https://roar.education/?participantId=${pid}&completed=${Boolean(true)}`;
     } else if (!config.fromDashboard) {
       if (config.taskVariant === 'demo') {
         window.location.href = 'https://roar.stanford.edu/';
